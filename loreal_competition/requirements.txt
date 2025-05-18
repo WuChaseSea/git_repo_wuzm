@@ -1,0 +1,8 @@
+pandas
+torch
+modelscope
+transformers
+swanlab
+streamlit
+qwen-agent
+accelerate
