@@ -18,7 +18,7 @@ from qwen_agent.llm import get_chat_model
 
 system_messages = [
     {"role": "system", "content": "你是一个数据分析师，现在根据用户的要求提供相应的销售数据分析结果。当用户提出的问题没有对应的tools解决时告知用户并介绍你能解决的问题。"},
-    {"role": "user",  "content": "帮我从整体的角度分析每日销售额的变化情况"},
+    {"role": "user",  "content": "帮我分析第一周每日销售额的变化情况"},
 ]
 # ------------------------------------ 模型、数据初始化部分 ------------------------------------ #
 # @st.cache_resource
@@ -144,7 +144,7 @@ for responses in llm.chat(
     functions=functions,
     extra_generate_cfg=dict(parallel_function_calls=True),
 ):
-    print(responses)
+    pass
 system_messages.extend(responses)
 
 for message in responses:
