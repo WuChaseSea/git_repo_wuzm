@@ -47,7 +47,7 @@ cursor.execute(create_table_query)
 conn.commit()
 
 # 读取CSV文件
-csv_file_path = './data/赛题三： 数据解构师（random_order_data）.csv'  # 替换为你的CSV文件路径
+csv_file_path = './data/赛题三： 数据解构师（GB2312编码）.csv'  # 替换为你的CSV文件路径
 # 定义列名
 column_names = [
     "order_no", "order_time", "order_date", "brand_code", "program_code", "order_type",
