@@ -61,3 +61,4 @@ Qwen2.5-7B-Instruct/configuration.json filter=lfs diff=lfs merge=lfs -text
 Qwen2.5-7B-Instruct/model-00001-of-00004.safetensors filter=lfs diff=lfs merge=lfs -text
 Qwen2.5-7B-Instruct/model.safetensors.index.json filter=lfs diff=lfs merge=lfs -text
 Qwen2.5-7B-Instruct/config.json filter=lfs diff=lfs merge=lfs -text
+.db

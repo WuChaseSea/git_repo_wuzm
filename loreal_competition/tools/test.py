@@ -7,20 +7,13 @@
 '''
 import os, sys
 sys.path.append('./')
-from demo import daily_sales, sales_by_brand, orders_by_channel
-from transformers import AutoTokenizer
+from funciton_tools.trend_analysis import analyze_trend, plot_trend
 
 if __name__ == "__main__":
-    print(f"测试按日期统计销售额：")
-    daily_sales_output = daily_sales()
-    print(daily_sales_output)
-
-    print(f"测试按品牌统计销售额：")
-    brand_sales_output = sales_by_brand()
-    print(brand_sales_output)
-
-    print(f"测试按渠道统计订单数量：")
-    orders_by_channel_output = orders_by_channel()
-    print(orders_by_channel_output)
+    data = analyze_trend(
+        "销售额", "订单日期", "D", "2024-03-01", "2024-03-30"
+    )
+    print(data)
+    plot_trend(data, "销售额", "订单日期")
 
 
