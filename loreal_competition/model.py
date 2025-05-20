@@ -28,6 +28,8 @@ def llm_chat(message):
         pass
     st.session_state.system_messages.extend(responses)
 
+    current_outputs = []  # 每次调用新建一个输出列表
+
     # st.session_state.outputs = []
     for message in responses:
 
@@ -39,7 +41,7 @@ def llm_chat(message):
                 fn_args['data'] = st.session_state.df_cache[-1]
             # fn_res: str = json.dumps(get_function_by_name(fn_name)(**fn_args))
             result = get_function_by_name(fn_name)(**fn_args)
-            st.session_state.outputs[-1].append(result)
+            current_outputs.append(result)  # 添加本轮的函数输出
 
             if fn_name != "plot_trend":
                 st.session_state.system_messages.append({  # 以function作为role添加到message中去；
@@ -47,6 +49,7 @@ def llm_chat(message):
                     "name": fn_name,
                     "content": json.dumps(result),
                 })
+    st.session_state.outputs.append(current_outputs)
     for responses in llm.chat(messages=st.session_state.system_messages, functions=functions):
         pass
     st.session_state.system_messages.extend(responses)

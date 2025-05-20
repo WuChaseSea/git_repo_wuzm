@@ -46,13 +46,20 @@ with st.container():
         st.write(st.session_state.welcome_message)
         st.write("[Github > ](https://github.com/WuChaseSea/git_repo_wuzm.git)")
 
-st.session_state.outputs = []
+if "outputs" not in st.session_state:
+    st.session_state.outputs = []
 # 显示聊天历史记录
-# for message in st.session_state.system_messages:
-#     if message["role"]=='system':   # 不打印提示词
-#         continue
-#     with st.chat_message(message["role"]):
-#         st.markdown(message["content"])
+for idx, message in enumerate(st.session_state.system_messages):
+    if message["role"] == 'system':
+        continue
+    if message["role"] == "function":
+        # 用输出中的对应轮次进行展示
+        with st.chat_message("assistant"):
+            for output in st.session_state.outputs.pop(0):  # 每轮pop对应输出
+                render_function_output(output)
+        continue
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
 
 # 接受用户输入
 if prompt := st.chat_input("分析2024年上半年每日销售额的变化情况并绘制图表分析"):
