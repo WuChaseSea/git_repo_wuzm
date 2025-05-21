@@ -49,29 +49,36 @@ with st.container():
 if "outputs" not in st.session_state:
     st.session_state.outputs = []
 # 显示聊天历史记录
+function_show = True
 for idx, message in enumerate(st.session_state.system_messages):
     if message["role"] == 'system':
         continue
-    if message["role"] == "function":
+    if message["role"] == "function" and st.session_state.system_messages[idx-1]["role"] != "function":
         # 用输出中的对应轮次进行展示
-        with st.chat_message("assistant"):
-            for output in st.session_state.outputs.pop(0):  # 每轮pop对应输出
-                render_function_output(output)
+        for output in st.session_state.outputs:  # 每轮pop对应输出
+            render_function_output(output)
         continue
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
+    elif message["role"] == "function" and st.session_state.system_messages[idx-1]["role"] == "function":
+        continue
+    else:
+        if message["content"] == "":
+            continue
+        else:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
 # 接受用户输入
-if prompt := st.chat_input("分析2024年上半年每日销售额的变化情况并绘制图表分析"):
+if prompt := st.chat_input("分析2024年1月份每日销售额的变化情况并绘制图表分析"):
     # 将用户输入添加进聊天历史记录
     # 将用户输入打印到屏幕上
-    st.session_state.outputs.append([])
     with st.chat_message("user"):
         st.markdown(prompt)
     # 打印模型输出到屏幕上
-    response = llm_chat({"role": "user", "content": prompt})  # 获取模型输出
+    with st.spinner(f"正在思考..."):
+        response = llm_chat({"role": "user", "content": prompt})  # 获取模型输出
     with st.chat_message("assistant"):
-        for output in st.session_state.outputs[-1]:
+        for output in st.session_state.outputs:
             render_function_output(output)
+            del output
         st.markdown(response)
     # 将模型输出打印到屏幕上
