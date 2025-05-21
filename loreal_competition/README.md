@@ -9,6 +9,15 @@
 * 趋势分析
 plot_trend(data, column, time_col, period)
 
+1）支持查询不同属性随日期的变化；
+例如：
+帮我分析2024年上半年每日销售额的变化情况；
+
+2）支持按照一种属性查找另一种属性；
+例如：
+请统计不同品牌的销售额分布并用柱状图展示
+分析各商品类型的订单数量，生成饼图
+
 * 分组统计
 group_by_and_agg(data, group_col, agg_col, method)
 

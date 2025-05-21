@@ -24,6 +24,19 @@ def render_function_output(output):
         st.markdown(str(output))
 
 st.set_page_config(page_title="BeautyInsight Agent", page_icon=":rocket:", layout="wide")
+with st.sidebar:
+    st.title("Welcome to BeautyInsight Agent!")
+    time.sleep(0.5)
+    st.write("[Github > ](https://github.com/WuChaseSea/git_repo_wuzm.git)")
+
+model_name = st.sidebar.selectbox(
+    "模型名称",
+    [
+        "QWEN-2.5",
+        "QWEN-3"
+    ]
+)
+
 if "system_messages" not in st.session_state:
     st.session_state.system_messages = [
         {"role": "system", "content": "你是一个数据分析师，现在根据用户的要求提供相应的销售数据分析结果。当用户提出的问题没有对应的tools解决时告知用户并介绍你能解决的问题。"},
@@ -31,7 +44,6 @@ if "system_messages" not in st.session_state:
     ]
 # TITLE SECTION
 with st.container():
-    st.title("Welcome to BeautyInsight Agent!")
     if 'initialized' not in st.session_state:
         st.session_state.initialized = True
     if st.session_state.initialized:
@@ -39,12 +51,11 @@ with st.container():
         st.write(stream_data(st.session_state.welcome_message))
         # st.session_state.introduction_message = introduction_message()
         # st.write(stream_data(st.session_state.introduction_message))
-        time.sleep(0.5)
-        st.write("[Github > ](https://github.com/WuChaseSea/git_repo_wuzm.git)")
         st.session_state.initialized = False
     else:
         st.write(st.session_state.welcome_message)
         st.write("[Github > ](https://github.com/WuChaseSea/git_repo_wuzm.git)")
+
 
 if "outputs" not in st.session_state:
     st.session_state.outputs = []
