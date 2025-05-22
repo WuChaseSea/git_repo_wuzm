@@ -27,12 +27,17 @@ def llm_chat(message):
         extra_generate_cfg=dict(parallel_function_calls=True),
     ):
         pass
+
     st.session_state.system_messages.extend(responses)
 
     # st.session_state.outputs = []
     for message in responses:
 
         if fn_call := message.get("function_call", None):
+            with st.sidebar:
+                with st.expander(f"🔹 {fn_call['name']}", expanded=False):
+                    st.code(json.dumps(fn_call['arguments'], indent=2, ensure_ascii=False), language="json")
+
             fn_name: str = fn_call['name']
             fn_args: dict = json.loads(fn_call["arguments"])
             
@@ -47,6 +52,9 @@ def llm_chat(message):
                 "content": json.dumps({f'{fn_name}': 'success'}),
             })
             st.session_state.outputs.append(result)
+        else:
+            with st.sidebar:
+                st.info("尚未调用任何函数")
     
     for responses in llm.chat(messages=st.session_state.system_messages, functions=functions):
         pass

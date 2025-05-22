@@ -79,7 +79,7 @@ for idx, message in enumerate(st.session_state.system_messages):
                 st.markdown(message["content"])
 
 # 接受用户输入
-if prompt := st.chat_input("分析2024年1月份每日销售额的变化情况并绘制图表分析"):
+if prompt := st.chat_input("输入您的命令"):
     # 将用户输入添加进聊天历史记录
     # 将用户输入打印到屏幕上
     with st.chat_message("user"):

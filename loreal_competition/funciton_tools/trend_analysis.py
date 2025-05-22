@@ -92,3 +92,19 @@ def plot_trend(
         "content": fig
     }
     # st.plotly_chart(fig)
+
+def analyze_distribution(group_by_field: str, agg_field: str, agg_func: str = "count"):
+    sql = f"""
+        SELECT {group_by_field} AS category, 
+               {agg_func}({agg_field}) AS value
+        FROM orders
+        GROUP BY {group_by_field}
+        ORDER BY value DESC
+    """
+    conn = sqlite3.connect('data/order_database.db')
+    df = pd.run_sql_query(sql)
+    # 缓存用于图表绘制
+    if "df_cache" not in st.session_state:
+        st.session_state.df_cache = []
+    st.session_state.df_cache.append(df)
+    return df.to_dict(orient="records")
