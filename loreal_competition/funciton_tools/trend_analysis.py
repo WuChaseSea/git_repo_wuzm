@@ -57,8 +57,7 @@ def analyze_trend(
     grouped = data.groupby(pd.Grouper(key=time_column, freq=freq))[value_column].sum().reset_index()
     grouped[time_column] = grouped[time_column].dt.strftime('%Y-%m-%d')
     grouped = grouped.set_index(time_column)[value_column].to_dict()
-    if "df_cache" not in st.session_state:
-        st.session_state.df_cache = []
+    st.session_state.df_cache = []
     st.session_state.df_cache.append(grouped)
     # 绘图
     # fig = px.line(grouped, x=time_column, y=value_column, title=f"{value_column} 趋势分析", markers=True)
@@ -94,17 +93,52 @@ def plot_trend(
     # st.plotly_chart(fig)
 
 def analyze_distribution(group_by_field: str, agg_field: str, agg_func: str = "count"):
+    """按某字段对数值字段进行聚合统计。
+
+    Args:
+        group_by_field: 需要绘制的数据
+        agg_field: 要分析的数值字段
+        agg_func: 对数值字段进行的操作，包括
+
+    Returns:
+        
+    """
     sql = f"""
         SELECT {group_by_field} AS category, 
                {agg_func}({agg_field}) AS value
-        FROM orders
+        FROM new_fact_order_detail
         GROUP BY {group_by_field}
         ORDER BY value DESC
     """
-    conn = sqlite3.connect('data/order_database.db')
-    df = pd.run_sql_query(sql)
+    conn = sqlite3.connect('./data/order_database.db')
+    df = pd.read_sql_query(sql, conn)
     # 缓存用于图表绘制
-    if "df_cache" not in st.session_state:
-        st.session_state.df_cache = []
+    st.session_state.df_cache = []
     st.session_state.df_cache.append(df)
-    return df.to_dict(orient="records")
+    return {
+        "type": "table",
+        "content": df.to_dict(orient="records")
+    }
+
+def plot_distribution(data: list, chart_type: str = "bar", title: str = "分布图"):
+    """绘制分布图。
+
+    Args:
+        data: 需要绘制的数据
+        chart_type: 绘制的图表类型，包括柱状图、饼图
+        title: 图表标题
+
+    Returns:
+        
+    """
+    df = pd.DataFrame(data)
+    if chart_type == "bar":
+        fig = px.bar(df, x="category", y="value", title=title)
+    elif chart_type == "pie":
+        fig = px.pie(df, names="category", values="value", title=title)
+    else:
+        raise ValueError("Unsupported chart type")
+    return {
+        "type": "plot",
+        "content": fig
+    }

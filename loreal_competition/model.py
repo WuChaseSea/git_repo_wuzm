@@ -41,7 +41,7 @@ def llm_chat(message):
             fn_name: str = fn_call['name']
             fn_args: dict = json.loads(fn_call["arguments"])
             
-            if fn_name == "plot_trend":
+            if fn_name == "plot_trend" or fn_name == "plot_distribution":
                 fn_args['data'] = st.session_state.df_cache[-1]
             # fn_res: str = json.dumps(get_function_by_name(fn_name)(**fn_args))
             result = get_function_by_name(fn_name)(**fn_args)

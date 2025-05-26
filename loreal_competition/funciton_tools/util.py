@@ -1,4 +1,4 @@
-from funciton_tools.trend_analysis import analyze_trend, plot_trend
+from funciton_tools.trend_analysis import analyze_trend, plot_trend, analyze_distribution, plot_distribution
 
 TOOLS = [
     {
@@ -61,6 +61,58 @@ TOOLS = [
                 "required": ["data", "value_column", "time_column"]
             },
         },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "analyze_distribution",
+            "description": "按某字段对数值字段进行聚合统计",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "group_by_field": {
+                        "type": "string",
+                        "description": "要绘制的数据"
+                    },
+                    "agg_field": {
+                        "type": "string",
+                        "description": "要分析的数值字段，如销售额"
+                    },
+                    "agg_func": {
+                        "type": "string",
+                        "description": "表示时间的列名，如日期",
+                        "enum": ["count", "sum", "avg"]
+                    }
+                },
+                "required": ["group_by_field", "agg_field"]
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "plot_distribution",
+            "description": "绘制分布图",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "object",
+                        "description": "要绘制的数据"
+                    },
+                    "chart_type": {
+                        "type": "string",
+                        "description": "要分析的数值字段，如销售额",
+                        "enum": ["bar", "pie"]
+                    },
+                    "title": {
+                        "type": "string",
+                        "description": "表示时间的列名，如日期"
+                    }
+                },
+                "required": ["data", "chart_type"]
+            },
+        },
     }
 ]
 
@@ -71,3 +123,7 @@ def get_function_by_name(name):
         return analyze_trend
     if name == "plot_trend":
         return plot_trend
+    if name == "analyze_distribution":
+        return analyze_distribution
+    if name == "plot_distribution":
+        return plot_distribution
