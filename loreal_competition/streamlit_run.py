@@ -8,7 +8,8 @@
 import time
 import streamlit as st
 
-from util import welcome_message, introduction_message, stream_data
+from util import welcome_message, introduction_message, stream_data, read_table, attribute_info
+from llm_service import decide_questions
 
 from model import llm_chat
 
@@ -56,6 +57,15 @@ with st.container():
         st.write(st.session_state.welcome_message)
         st.write("[Github > ](https://github.com/WuChaseSea/git_repo_wuzm.git)")
 
+if "df_uploaded" not in st.session_state:
+    st.session_state.df_uploaded = read_table()
+    st.dataframe(st.session_state.df_uploaded.describe(), width=1200)
+attributes_info, types_info, head_info = attribute_info(st.session_state.df_uploaded)
+prob_questions = decide_questions(attributes_info, head_info)
+with st.sidebar:
+    st.write(prob_questions[0])
+    st.write(prob_questions[1])
+    st.write(prob_questions[2])
 
 if "outputs" not in st.session_state:
     st.session_state.outputs = []

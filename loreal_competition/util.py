@@ -38,5 +38,16 @@ def read_table():
     df = pd.read_sql_query(query, conn)
     return df
 
+def attribute_info(df):
+    """
+    Obtain the attributes, types, and head information of the DataFrame.
+    """
+    attributes = df.columns.tolist()
+    dtypes_df = df.dtypes
+    types_info = "\n".join([f"{index}:{dtype}" for index, dtype in dtypes_df.items()])
+    head_info = df.head(10).to_csv()
+
+    return attributes, types_info, head_info
+
 if __name__ == "__main__":
     df = read_table()

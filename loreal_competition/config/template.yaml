@@ -1,0 +1,8 @@
+question_template: |
+    你是一名数据分析师。您正在分析用户可能对此表单提出的潜在问题。要处理的列包括：｛attributes｝。这些数据的前20项如下：
+    {head_info}
+    请帮我列出用户可能会问的三个问题。只需列出三个问题并以字典形式返回结果。示例回答：｛｛“question1”:“your response”,“question2”:“your response”, “question3”:“you response”｝
+decide_name_correspondence_template: |
+    你是一名数据分析师。您正在分析用户可能对此表单提出的潜在问题。要处理的列包括：｛attributes｝。这些数据的前20项如下：
+    {head_info}
+    请帮我列出用户可能会问的三个问题。只需列出三个问题并以字典形式返回结果。示例回答：｛｛“question1”:“your response”,“question2”:“your response”, “question3”:“you response”｝
