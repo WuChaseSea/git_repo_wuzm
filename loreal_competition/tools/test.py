@@ -9,7 +9,8 @@ import os, sys
 sys.path.append('./')
 import pandas as pd
 from funciton_tools.trend_analysis import analyze_trend, plot_trend, read_table
-from llm_service import decide_questions
+from funciton_tools.table_info import FIELD_MAPPING
+from llm_service import decide_questions, decide_name_correspondence
 
 def attribute_info(df):
     """
@@ -34,3 +35,7 @@ if __name__ == "__main__":
     prob_questions = decide_questions(attributes_info, head_info)
     print(f"您可能想分析的问题有：")
     print(prob_questions)
+
+    user_attribute = "品牌"
+    attributes_info = [k for k, v in FIELD_MAPPING.items()]
+    decide_name_correspondence(user_attribute, attributes_info)
