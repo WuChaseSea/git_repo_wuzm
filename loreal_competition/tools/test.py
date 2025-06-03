@@ -32,10 +32,12 @@ if __name__ == "__main__":
     print(f"***** head_info *****")
     print(head_info)
 
-    prob_questions = decide_questions(attributes_info, head_info)
-    print(f"您可能想分析的问题有：")
-    print(prob_questions)
+    # prob_questions = decide_questions(attributes_info, head_info)
+    # print(f"您可能想分析的问题有：")
+    # print(prob_questions)
 
-    user_attribute = "品牌"
+    user_attribute = "渠道类型"
     attributes_info = [k for k, v in FIELD_MAPPING.items()]
-    decide_name_correspondence(user_attribute, attributes_info)
+    result = decide_name_correspondence(user_attribute, attributes_info)
+    if result: print(result[0])
+    else: print(f'result is None')

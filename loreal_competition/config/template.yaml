@@ -4,4 +4,4 @@ question_template: |
     请帮我列出用户可能会问的三个问题。只需列出三个问题并以字典形式返回结果。示例回答：{{“question1”:“your response”,“question2”:“your response”, “question3”:“you response”}}
 decide_name_correspondence_template: |
     你是一名数据分析师。您需要根据用户提供的属性判断该属性对应表格中的哪一个属性名称，你必须保证你对应的属性在表格里面。用户提供的属性是：{user_attribute}，表格的属性包括：{attributes}。
-    请帮我根据用户提供的属性判断该属性对应表格中的哪一个属性名称，以字典形式返回结果。必须保证你对应的属性在属性表里面，否则返回空字典。示例回答: {{"response":"your response"}}
+    请帮我根据用户提供的属性判断该属性对应表格中的哪一个属性名称，以字典形式返回结果。必须保证你对应的属性在属性表里面，否则返回空字典。示例回答: {{"result":"your response"}}

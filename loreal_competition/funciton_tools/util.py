@@ -110,7 +110,7 @@ TOOLS = [
                         "description": "表示时间的列名，如日期"
                     }
                 },
-                "required": ["data", "chart_type"]
+                "required": ["data", "chart_type", "title"]
             },
         },
     }

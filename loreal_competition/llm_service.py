@@ -14,7 +14,7 @@ from langchain.schema import HumanMessage
 from langchain_community.chat_models.tongyi import ChatTongyi
 
 config_path = os.path.join(os.path.dirname(__file__), 'config', 'template.yaml')
-with open(config_path, 'r') as file:
+with open(config_path, 'r', encoding='utf-8') as file:
     config = yaml.safe_load(file)
 
 def decide_questions(attributes, head_info, model_type = 2, user_api_key = None):
@@ -76,12 +76,22 @@ def decide_name_correspondence(user_attribute, attributes, model_type = 2, user_
         summary_prompt = prompt_template.format(user_attribute=user_attribute, attributes=attributes)
 
         llm_answer = llm([HumanMessage(content=summary_prompt)])
+        print("🧠 LLM 返回内容:\n", llm_answer.content)
         if '```json' in llm_answer.content:
             match = re.search(r'```json\n(.*?)```', llm_answer.content, re.DOTALL)
             if match: json_str = match.group(1)
+            else: return None
         else: json_str = llm_answer.content
-        json_result = json.loads(json_str)
-        import ipdb;ipdb.set_trace()
+        if not json_str:
+            print(f'json is None')
+            return None
+        # 尝试解析 JSON
+        try:
+            json_result = json.loads(json_str)
+        except json.JSONDecodeError as je:
+            print("❌ JSON 解析失败:", je)
+            print("🔍 原始内容:", repr(json_str))
+            return None
         return [v for k, v in json_result.items()]
     except Exception as e:
         print(e)

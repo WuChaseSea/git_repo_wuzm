@@ -12,6 +12,8 @@ import plotly.express as px
 import streamlit as st
 
 from funciton_tools.table_info import FIELD_MAPPING
+from llm_service import decide_name_correspondence
+from util import attribute_info
 
 def read_table():
     query = """
@@ -103,6 +105,11 @@ def analyze_distribution(group_by_field: str, agg_field: str, agg_func: str = "c
     Returns:
         
     """
+    data = read_table()
+    attributes_info, types_info, head_info = attribute_info(data)
+    attributes_info = [k for k, v in FIELD_MAPPING.items()]
+    group_by_field = FIELD_MAPPING[decide_name_correspondence(group_by_field, attributes_info)[0]]
+    agg_field = FIELD_MAPPING[decide_name_correspondence(agg_field, attributes_info)[0]]
     sql = f"""
         SELECT {group_by_field} AS category, 
                {agg_func}({agg_field}) AS value
