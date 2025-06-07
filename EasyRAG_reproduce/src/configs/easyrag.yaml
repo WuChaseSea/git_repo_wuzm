@@ -1,0 +1,18 @@
+# 大语言模型参数
+llm_name: "qwen"
+
+# 数据参数
+data_path: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/format_data_with_img"
+
+# 分块策略
+split_type: 0 # 0-->Sentence 1-->Hierarchical
+chunk_size: 1024
+chunk_overlap: 200
+
+# 密集检索器参数
+qdrant_url: "http://localhost:6333"
+reindex: false
+embedding_name: "embedding_models/bge-small-en-v1.5"
+vector_size: 3584
+cache_path: "cache"
+collection_name: "ainops24"
