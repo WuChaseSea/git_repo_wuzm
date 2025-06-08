@@ -7,7 +7,7 @@ from llama_index.core.ingestion import IngestionPipeline
 from llama_index.core.llms.llm import LLM
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from qdrant_client import AsyncQdrantClient, models
+from qdrant_client import AsyncQdrantClient, models, QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 
@@ -81,6 +81,7 @@ def read_data(path: str = "data") -> List[Document]:
         required_exts=[
             ".txt"
         ],
+        encoding="utf-8"
     )
     return reader.load_data()
 
@@ -143,6 +144,9 @@ async def build_vector_store(
     client = AsyncQdrantClient(
         path=cache_path,
     )
+    # client = QdrantClient(
+    #     path=cache_path,
+    # )
 
     if reindex:
         try:

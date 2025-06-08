@@ -52,14 +52,14 @@ class CustomFilePathExtractor(BaseExtractor):
     async def aextract(self, nodes: Sequence[BaseNode]) -> list[dict]:
         pathmap_file = os.path.join(self.data_path, "pathmap.json")
         if os.path.exists(pathmap_file):
-            with open(pathmap_file) as f:
+            with open(pathmap_file, encoding="utf-8") as f:
                 pathmap = json.loads(f.read())
         else:
             pathmap = None
         imgmap_file = os.path.join(self.data_path, "imgmap_filtered.json")
         print(imgmap_file, flush=True)
         if os.path.exists(imgmap_file):
-            with open(imgmap_file) as f:
+            with open(imgmap_file, encoding="utf-8") as f:
                 imgmap = json.loads(f.read())
         else:
             imgmap = None

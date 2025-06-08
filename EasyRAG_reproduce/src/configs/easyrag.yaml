@@ -3,7 +3,7 @@ llm_name: "qwen"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
-data_path: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/format_data_with_img"
+data_path: "E:/数据集/Rag/EasyRAG/format_data_with_img"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical

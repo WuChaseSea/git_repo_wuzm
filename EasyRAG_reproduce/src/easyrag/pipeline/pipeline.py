@@ -103,7 +103,7 @@ class EasyRAGPipeline:
                     optimizer_config=models.OptimizersConfigDiff(indexing_threshold=0),
                 )
                 import ipdb;ipdb.set_trace()
-                nodes = await pipeline.run(documents=data, show_progress=True, num_workers=4)
+                nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
                 nodes = await pipeline.arun(documents=data, show_progress=True, num_workers=1)
                 with open(CACHE_FILE, "wb") as f:
                     pickle.dump(nodes, f)
