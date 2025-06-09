@@ -16,9 +16,9 @@ from src.easyrag.pipeline import EasyRAGPipeline, read_jsonl
 
 def get_test_data(split="val"):
     if split == "test":
-        queries = read_jsonl("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/question.jsonl")
+        queries = read_jsonl("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/src/data/question.jsonl")
     else:
-        with open("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/val.json") as f:
+        with open("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/src/data/val.json") as f:
             queries = json.loads(f.read())
     return queries
 
@@ -40,8 +40,23 @@ async def main(
     answers = []
     all_nodes = []
     all_contexts = []
-    for query in tqdm(queries, total=len(queries)):
+    all_keyword_acc = 0
+    N = len(queries)
+    for num, query in enumerate(tqdm(queries, total=len(queries))):
         res = await rag_pipeline.run(query)
+
+        answer = res["answer"]
+        keywords = query["keywords"]
+        M = len(keywords)
+        keyword_acc = 0
+        for keyword in keywords:
+            if keyword in answer:
+                keyword_acc += 1
+        keyword_acc /= M
+        all_keyword_acc += keyword_acc
+        print(f"query {num} acc: {keyword_acc}")
+    all_keyword_acc /= N
+    print(f"queries average acc: {all_keyword_acc}")
 
 
 if __name__ == "__main__":

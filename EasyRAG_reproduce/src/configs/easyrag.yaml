@@ -3,7 +3,7 @@ llm_name: "qwen"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
-data_path: "E:/数据集/Rag/EasyRAG/format_data_with_img"
+data_path: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/format_data_with_img"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical
@@ -22,8 +22,8 @@ collection_name: "ainops24"
 re_only: false  # 只检索，用于调试检索
 retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
 f_topk: 256 # 仅用于混合检索器最终的fusion数量
-f_topk_1: 288
-f_topk_2: 192
+f_topk_1: 64
+f_topk_2: 32
 f_topk_3: 6
 
 # 文本排序编码方式

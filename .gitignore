@@ -1,4 +1,6 @@
+*.sqlite
 embedding_models/
 data/
 cache/
 cache_test/
+pipeline_storage/

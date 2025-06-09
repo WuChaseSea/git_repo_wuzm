@@ -28,8 +28,14 @@ async def generation(llm, fmt_qa_prompt):
     # fmt_qa_prompt = filter_specfic_words(fmt_qa_prompt)
     while True:
         try:
-            ret = await llm.acomplete(fmt_qa_prompt)
-            return ret
+            messages = [{
+                'role': 'user',
+                'content': fmt_qa_prompt
+            }]
+            responses = {}
+            for responses in llm.chat(messages=messages, stream=True):
+                pass
+            return responses[0]["content"]
         except Exception as e:
             print(e)
             cnt += 1

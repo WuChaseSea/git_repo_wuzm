@@ -69,79 +69,61 @@ class EasyRAGPipeline:
 
         vector_store = None
         collection_name = config["collection_name"]
-        client, vector_store = await build_vector_store(
+        client, vector_store = build_vector_store(
             qdrant_url=config["qdrant_url"],
             cache_path=config["cache_path"],
             reindex=config["reindex"],
             collection_name=collection_name,
             vector_size=config["vector_size"]
         )
-        collection_info = await client.get_collection(
+        collection_info = client.get_collection(
             collection_name=collection_name
         )
-
-        import pickle
-        CACHE_FILE = f"cache/{collection_name}_cached_nodes.pkl"
+        pipeline = build_pipeline(
+            self.llm, embedding, vector_store=vector_store, data_path=data_path,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
 
         if collection_info.points_count == 0:
-            if os.path.exists(CACHE_FILE):
-                print("加载本地缓存的 nodes")
-                with open(CACHE_FILE, "rb") as f:
-                    nodes = pickle.load(f)
-                print(f"已加载{len(nodes)}个节点")
-                for node in nodes:
-                    vector_store.add(node.get_embedding())  # 添加到 Qdrant
-            else:
-                pipeline = build_pipeline(
-                    self.llm, embedding, vector_store=vector_store, data_path=data_path,
-                    chunk_size=chunk_size,
-                    chunk_overlap=chunk_overlap,
-                )
             # 暂时停止实时索引
-                await client.update_collection(
-                    collection_name=collection_name,
-                    optimizer_config=models.OptimizersConfigDiff(indexing_threshold=0),
-                )
-                import ipdb;ipdb.set_trace()
-                nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
-                nodes = await pipeline.arun(documents=data, show_progress=True, num_workers=1)
-                with open(CACHE_FILE, "wb") as f:
-                    pickle.dump(nodes, f)
-                print(f"索引建立完成，已缓存{len(nodes)}个节点")
+            client.update_collection(
+                collection_name=collection_name,
+                optimizer_config=models.OptimizersConfigDiff(indexing_threshold=0),
+            )
+
+            nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
             # 恢复实时索引
-            await client.update_collection(
+            client.update_collection(
                 collection_name=collection_name,
                 optimizer_config=models.OptimizersConfigDiff(indexing_threshold=20000),
             )
+            pipeline.persist("./pipeline_storage")
 
             print(f"索引建立完成，一共有{len(nodes)}个节点")
+        else:
+            pipeline.load("./pipeline_storage")
+            nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
 
-        split_type = config["split_type"]
-        preprocess_pipeline = build_preprocess_pipeline(
-            data_path,
-            chunk_size,
-            chunk_overlap,
-            split_type
-        )
-        nodes_ = await preprocess_pipeline.arun(documents=data, show_progress=True, num_workers=1)
-        print(f"索引已建立，一共有{len(nodes_)}个节点")
+        # split_type = config["split_type"]
+        # preprocess_pipeline = build_preprocess_pipeline(
+        #     data_path,
+        #     chunk_size,
+        #     chunk_overlap,
+        #     split_type
+        # )
+        # nodes_ = await preprocess_pipeline.arun(documents=data, show_progress=True, num_workers=1)
+        # print(f"索引已建立，一共有{len(nodes_)}个节点")
 
         if embedding is not None:
             f_topk_1 = config["f_topk_1"]
             self.dense_retriever = QdrantRetriever(vector_store, embedding, similarity_top_k=f_topk_1)
             print(f"创建{embedding}密集检索器成功")
 
-        self.stp_words = load_stopwords("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/data/hit_stopwords.txt")
+        self.stp_words = load_stopwords("/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG/src/data/hit_stopwords.txt")
         import jieba
         self.sparse_tk = jieba.Tokenizer()
-        if split_type == 1:
-            self.nodes = get_leaf_nodes(nodes_)
-            print("叶子节点数量:", len(self.nodes))
-            docstore = SimpleDocumentStore()
-            docstore.add_documents(self.nodes)
-            storage_context = StorageContext.from_defaults(docstore=docstore)
-        else:
-            self.nodes = nodes_
+        self.nodes = nodes
         f_topk_2 = config['f_topk_2']
         f_embed_type_2 = config['f_embed_type_2']
         bm25_type = config['bm25_type']
@@ -155,24 +137,8 @@ class EasyRAGPipeline:
         )
 
         f_topk_3 = config['f_topk_3']
-        if f_topk_3 != 0:
-            self.path_retriever = BM25Retriever.from_defaults(
-                nodes=self.nodes,
-                tokenizer=self.sparse_tk,
-                similarity_top_k=f_topk_3,
-                stopwords=self.stp_words,
-                embed_type=5,  # 4-->file_path 5-->know_path
-                bm25_type=bm25_type,
-            )
-        else:
-            self.path_retriever = None
+        self.path_retriever = None
 
-        if split_type == 1:
-            self.sparse_retriever = AutoMergingRetriever(
-                self.sparse_retriever,
-                storage_context,
-                simple_ratio_thresh=0.4,
-            )
         print("创建BM25稀疏检索器成功")
 
         # 创建node快速索引
@@ -249,6 +215,7 @@ class EasyRAGPipeline:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
             node_with_scores_path = []
+
         node_with_scores = HybridRetriever.fusion([
             node_with_scores,
             node_with_scores_path,
@@ -271,4 +238,4 @@ class EasyRAGPipeline:
             ret = await self.generation(self.llm, fmt_merge_prompt)
         elif self.ans_refine_type == 2:
             ret.text = ret.text + "\n\n" + contents[0]
-        return {"answer": ret.text, "nodes": node_with_scores, "contexts": contents}
+        return {"answer": ret, "nodes": node_with_scores, "contexts": contents}

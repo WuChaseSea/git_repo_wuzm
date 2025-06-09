@@ -11,8 +11,8 @@ from qdrant_client import AsyncQdrantClient, models, QdrantClient
 from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 
-from ..custom import SentenceSplitter, HierarchicalNodeParser, CustomTitleExtractor, CustomFilePathExtractor
-
+from ..custom import HierarchicalNodeParser, CustomTitleExtractor, CustomFilePathExtractor
+from llama_index.core.node_parser import SentenceSplitter
 
 def merge_strings(A, B):
     # 找到A的结尾和B的开头最长的匹配子串
@@ -105,8 +105,8 @@ def build_preprocess(
         )
     transformation = [
         parser,
-        CustomTitleExtractor(metadata_mode=MetadataMode.EMBED),
-        CustomFilePathExtractor(last_path_length=100000, data_path=data_path, metadata_mode=MetadataMode.EMBED),
+        # CustomTitleExtractor(metadata_mode=MetadataMode.EMBED),
+        # CustomFilePathExtractor(last_path_length=100000, data_path=data_path, metadata_mode=MetadataMode.EMBED),
     ]
     return transformation
 
@@ -126,7 +126,7 @@ def build_preprocess_pipeline(
     return IngestionPipeline(transformations=transformation)
 
 
-async def build_vector_store(
+def build_vector_store(
         qdrant_url: str = "http://localhost:6333",
         cache_path: str = "cache",
         reindex: bool = False,
@@ -141,21 +141,26 @@ async def build_vector_store(
     #     client = AsyncQdrantClient(
     #         path=cache_path,
     #     )
-    client = AsyncQdrantClient(
-        path=cache_path,
-    )
-    # client = QdrantClient(
+    # client = AsyncQdrantClient(
     #     path=cache_path,
     # )
+    client = QdrantClient(
+        path=cache_path,
+    )
 
     if reindex:
         try:
-            await client.delete_collection(collection_name)
+            client.delete_collection(collection_name)
         except UnexpectedResponse as e:
             print(f"Collection not found: {e}")
-
+    # client.create_collection(
+    #         collection_name=collection_name,
+    #         vectors_config=models.VectorParams(
+    #             size=vector_size, distance=models.Distance.COSINE
+    #         ),
+    #     )
     try:
-        await client.create_collection(
+        client.create_collection(
             collection_name=collection_name,
             vectors_config=models.VectorParams(
                 size=vector_size, distance=models.Distance.COSINE
@@ -164,11 +169,15 @@ async def build_vector_store(
     except Exception as e:
         print("集合已存在")
     return client, QdrantVectorStore(
-        aclient=client,
-        collection_name=collection_name,
-        parallel=4,
-        batch_size=32,
+        client=client,
+        collection_name=collection_name
     )
+    # return client, QdrantVectorStore(
+    #     aclient=client,
+    #     collection_name=collection_name,
+    #     parallel=4,
+    #     batch_size=32,
+    # )
 
 
 def build_pipeline(
