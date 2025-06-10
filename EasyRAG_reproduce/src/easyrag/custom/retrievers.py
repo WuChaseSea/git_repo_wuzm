@@ -60,7 +60,7 @@ class QdrantRetriever(BaseRetriever):
         )
         query_result = self._vector_store.query(
             vector_store_query,
-            qdrant_filters=self.filters,  # 需要查找qdrant相关用法
+            # qdrant_filters=self.filters,  # 需要查找qdrant相关用法
         )
 
         node_with_scores = []

@@ -22,7 +22,7 @@ collection_name: "ainops24"
 re_only: false  # 只检索，用于调试检索
 retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
 f_topk: 256 # 仅用于混合检索器最终的fusion数量
-f_topk_1: 64
+f_topk_1: 48
 f_topk_2: 32
 f_topk_3: 6
 
