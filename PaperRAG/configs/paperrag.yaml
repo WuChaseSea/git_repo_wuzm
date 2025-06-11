@@ -1,0 +1,13 @@
+# 大语言模型参数
+llm_name: "qwen"
+llm_embed_type: 3 # 最终的上下文文档编码参数
+
+# 数据参数
+data_path: "/Volumes/wuzhaoming/数据集/天池论文回答/papar_QA_dataset/papers"
+
+# 分块策略
+split_type: 0 # 0-->Sentence 1-->Hierarchical
+chunk_size: 1024
+chunk_overlap: 50
+
+embedding_name: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG_reproduce/embedding_models/bge-base-zh-v1.5"

@@ -98,11 +98,11 @@ class EasyRAGPipeline:
                 collection_name=collection_name,
                 optimizer_config=models.OptimizersConfigDiff(indexing_threshold=20000),
             )
-            pipeline.persist("./pipeline_storage")
+            pipeline.persist("./pipeline_storage_bge_base")
 
             print(f"索引建立完成，一共有{len(nodes)}个节点")
         else:
-            pipeline.load("./pipeline_storage")
+            pipeline.load("./pipeline_storage_bge_base")
             nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
 
         # split_type = config["split_type"]

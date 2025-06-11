@@ -3,4 +3,6 @@ embedding_models/
 data/
 cache/
 cache_test/
+cache_bge_base/
 pipeline_storage/
+pipeline_storage_bge_base

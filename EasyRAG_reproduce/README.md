@@ -22,7 +22,12 @@
 
 基础版本：
 
-使用密集索引，在验证集上关键词精度0.55
+chunk size 1024 overlap 200 top48 使用密集索引，在验证集上关键词精度0.55
 
-使用稀疏索引，在验证集上关键词精度0.54
+chunk size 1024 overlap 200 top32 使用稀疏索引，在验证集上关键词精度0.54
 
+chunk size 1024 overlap 50 top3 使用密集索引，在验证集上关键词精度0.29
+chunk size 1024 overlap 50 top48 使用密集索引，在验证集上关键词精度0.54
+chunk size 1024 overlap 50 top8 使用密集索引，在验证集上关键词精度0.42
+chunk size 1024 overlap 50 top48 使用密集索引，在验证集上关键词精度0.52
+chunk size 1024 overlap 50 top32 使用密集索引，在验证集上关键词精度0.49
