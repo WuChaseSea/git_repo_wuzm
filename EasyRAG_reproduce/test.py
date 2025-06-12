@@ -34,7 +34,7 @@ vector_store = QdrantVectorStore(client=client, collection_name="test_store")
 pipeline = IngestionPipeline(transformations=[SentenceSplitter(chunk_size=25, chunk_overlap=0),embedding],vector_store=vector_store,)
 import ipdb;ipdb.set_trace()
 # Ingest directly into a vector db
-pipeline.run(documents=[Document.example()])
+pipeline.run(documents=[Document.example() for i in range(10)])
 
 # Create your index
 from llama_index.core import VectorStoreIndex

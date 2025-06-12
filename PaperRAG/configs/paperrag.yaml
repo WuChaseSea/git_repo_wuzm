@@ -10,4 +10,18 @@ split_type: 0 # 0-->Sentence 1-->Hierarchical
 chunk_size: 1024
 chunk_overlap: 50
 
+# 密集检索器参数
+qdrant_url: "http://localhost:6333"
+reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG_reproduce/embedding_models/bge-base-zh-v1.5"
+vector_size: 768
+cache_path: "cache_bge_base"
+collection_name: "ainops24"
+
+# 粗排参数
+re_only: false  # 只检索，用于调试检索
+retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
+f_topk: 256 # 仅用于混合检索器最终的fusion数量
+f_topk_1: 32
+f_topk_2: 32
+f_topk_3: 6
