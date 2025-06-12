@@ -6,7 +6,7 @@
 * @function: 
 '''
 from typing import List
-from llama_index.core import SimpleDirectoryReader
+# from llama_index.core import SimpleDirectoryReader
 from llama_index.core.embeddings import BaseEmbedding
 from llama_index.core.llms.llm import LLM
 from llama_index.core.ingestion import IngestionPipeline
@@ -18,6 +18,9 @@ from qdrant_client import QdrantClient, models
 from qdrant_client.http.exceptions import UnexpectedResponse
 
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
+
+from ..custom.reader import SimpleDirectoryReader
+
 
 def read_data(path: str = "data") -> List[Document]:
     reader = SimpleDirectoryReader(

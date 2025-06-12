@@ -3,11 +3,11 @@ llm_name: "qwen"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
-data_path: "/Volumes/wuzhaoming/数据集/天池论文回答/papar_QA_dataset/papers"
+data_path: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/papar_QA_dataset/papers"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical
-chunk_size: 1024
+chunk_size: 768
 chunk_overlap: 50
 
 # 密集检索器参数
@@ -25,3 +25,7 @@ f_topk: 256 # 仅用于混合检索器最终的fusion数量
 f_topk_1: 32
 f_topk_2: 32
 f_topk_3: 6
+
+# 流程参数
+rerank_fusion_type: 0 # 0-->不使用精排后fusion 1-->两路检索结果rrf 2-->生成长度最大的作为最终结果 3-->两路生成结果拼接
+ans_refine_type: 0 # 0-->不对答案做后处理 1-->LLM利用top1文档和参考答案生成新答案 2-->LLM将top1文档和参考答案拼接生成新答案

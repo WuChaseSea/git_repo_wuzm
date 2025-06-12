@@ -5,4 +5,5 @@ cache/
 cache_test/
 cache_bge_base/
 pipeline_storage/
-pipeline_storage_bge_base
+pipeline_storage_bge_base/
+pipeline_storage_cache_bge_base/

@@ -5,7 +5,9 @@
 * created 2025/06/11 19:06:52
 * @function: 
 '''
-import os
+import os, sys
+import re
+from tqdm import tqdm
 import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
 
@@ -31,6 +33,9 @@ class PaperRAGPipeline():
     
     async def async_init(self):
         config = self.config
+        self.llm_embed_type = config['llm_embed_type']
+        self.re_only = config["re_only"]
+        self.ans_refine_type = config['ans_refine_type']
         print(f"Pipeline 初始化开始".center(60, "="))
         self.llm = get_chat_model({
             "model": "qwen-max",
@@ -81,18 +86,18 @@ class PaperRAGPipeline():
                 collection_name=collection_name,
                 optimizer_config=models.OptimizersConfigDiff(indexing_threshold=0),
             )
-
+                
             nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
             # 恢复实时索引
             client.update_collection(
                 collection_name=collection_name,
                 optimizer_config=models.OptimizersConfigDiff(indexing_threshold=20000),
             )
-            pipeline.persist(f"./pipeline_storage_{config["cache_path"]}")
+            pipeline.persist(f"./pipeline_storage_{config['cache_path']}")
 
             print(f"索引建立完成，一共有{len(nodes)}个节点")
         else:
-            pipeline.load(f"./pipeline_storage_{config["cache_path"]}")
+            pipeline.load(f"./pipeline_storage_{config['cache_path']}")
             nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
         
         if embedding is not None:
@@ -106,6 +111,8 @@ class PaperRAGPipeline():
         self.nodeid2idx = dict()
         for i, node in enumerate(self.nodes):
             self.nodeid2idx[node.node_id] = i
+        
+        self.path_retriever = None
 
         print("EasyRAGPipeline 初始化完成".center(60, "="))
     
@@ -141,10 +148,10 @@ class PaperRAGPipeline():
         "document": "所属路径" #用于过滤文档，可选
         '''
         self.filters, self.filter_dict = self.build_filters(query)
-        self.retriever.filters = self.filters
-        self.retriever.filter_dict = self.filter_dict
+        self.dense_retriever.filters = self.filters
+        self.dense_retriever.filter_dict = self.filter_dict
         res = await self.generation_with_knowledge_retrieval(
-            query_str=query["query"],
+            query_str=query["question"],
             hyde_query=query.get("hyde_query", "")
         )
         return res
@@ -156,7 +163,7 @@ class PaperRAGPipeline():
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
-        node_with_scores = self.retriever.retrieve(query_bundle)
+        node_with_scores = self.dense_retriever.retrieve(query_bundle)
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
