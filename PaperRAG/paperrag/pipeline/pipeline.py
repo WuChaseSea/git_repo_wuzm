@@ -36,9 +36,10 @@ class PaperRAGPipeline():
         self.llm_embed_type = config['llm_embed_type']
         self.re_only = config["re_only"]
         self.ans_refine_type = config['ans_refine_type']
+        self.work_dir = config["work_dir"]
         print(f"Pipeline 初始化开始".center(60, "="))
         self.llm = get_chat_model({
-            "model": "qwen-max",
+            "model": "qwen-max-latest",
             "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key": os.getenv("DASHSCOPE_API_KEY"),
         })
@@ -46,7 +47,7 @@ class PaperRAGPipeline():
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
 
         model_name = config["embedding_name"]
-        model_kwargs = {'device': 'cpu'}
+        model_kwargs = {'device': 'cuda'}
         encode_kwargs = {'normalize_embeddings': False}
         bge_embeddings = HuggingFaceBgeEmbeddings(
             model_name=model_name,
@@ -57,7 +58,7 @@ class PaperRAGPipeline():
         Settings.embed_model = embedding
         print(f"Embddding 创建完成.")
 
-        data_path = config["data_path"]
+        data_path = os.path.join(self.work_dir, config["data_path"])
         chunk_size = config["chunk_size"]
         chunk_overlap = config["chunk_overlap"]
         data = read_data(data_path)
@@ -67,7 +68,7 @@ class PaperRAGPipeline():
         collection_name = config["collection_name"]
         client, vector_store = build_vector_store(
             qdrant_url=config["qdrant_url"],
-            cache_path=config["cache_path"],
+            cache_path=os.path.join(self.work_dir, config["cache_path"]),
             reindex=config["reindex"],
             collection_name=collection_name,
             vector_size=config["vector_size"]
@@ -93,11 +94,12 @@ class PaperRAGPipeline():
                 collection_name=collection_name,
                 optimizer_config=models.OptimizersConfigDiff(indexing_threshold=20000),
             )
-            pipeline.persist(f"./pipeline_storage_{config['cache_path']}")
+            
+            pipeline.persist(os.path.join(self.work_dir, f"pipeline_storage_{config['cache_path']}"))
 
             print(f"索引建立完成，一共有{len(nodes)}个节点")
         else:
-            pipeline.load(f"./pipeline_storage_{config['cache_path']}")
+            pipeline.load(os.path.join(self.work_dir, f"pipeline_storage_{config['cache_path']}"))
             nodes = pipeline.run(documents=data, show_progress=True, num_workers=1)
         
         if embedding is not None:

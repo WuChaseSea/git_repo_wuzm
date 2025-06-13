@@ -1,9 +1,11 @@
+work_dir: "E:/Dataset/TIANCHIPaperRAG"
+
 # 大语言模型参数
 llm_name: "qwen"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
-data_path: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/papar_QA_dataset/papers"
+data_path: "papar_QA_dataset/papers"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical
@@ -13,7 +15,7 @@ chunk_overlap: 50
 # 密集检索器参数
 qdrant_url: "http://localhost:6333"
 reindex: false
-embedding_name: "/Users/wuzm/Documents/CodeRepository/git_repo_wuzm/EasyRAG_reproduce/embedding_models/bge-base-zh-v1.5"
+embedding_name: "D:/Lover/wuzm/git_repo_wuzm/EasyRAG_reproduce/embedding_models/bge-base-zh-v1.5"
 vector_size: 768
 cache_path: "cache_bge_base"
 collection_name: "ainops24"

@@ -212,7 +212,7 @@ class EasyRAGPipeline:
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         node_with_scores = self.retriever.retrieve(query_bundle)
-        import ipdb;ipdb.set_trace()
+        
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
