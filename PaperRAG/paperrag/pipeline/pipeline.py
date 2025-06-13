@@ -7,6 +7,7 @@
 '''
 import os, sys
 import re
+from pathlib import Path
 from tqdm import tqdm
 import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
@@ -18,12 +19,18 @@ from llama_index.embeddings.langchain import LangchainEmbedding
 from qdrant_client import models
 
 from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE
-from ..custom.retrievers import QdrantRetriever, HybridRetriever
-from .injestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
-from .injestion import get_node_content as _get_node_content
+from ..custom.retrievers import QdrantRetriever, HybridRetriever, BM25Retriever
+from ..custom.rerankers import SentenceTransformerRerank
+from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
+from .ingestion import get_node_content as _get_node_content
 from .rag import generation as _generation
 
 nest_asyncio.apply()
+
+def load_stopwords(path):
+    with open(path, 'r', encoding='utf-8') as file:
+        stopwords = set([line.strip() for line in file])
+    return stopwords
 
 
 class PaperRAGPipeline():
@@ -39,7 +46,7 @@ class PaperRAGPipeline():
         self.work_dir = config["work_dir"]
         print(f"Pipeline 初始化开始".center(60, "="))
         self.llm = get_chat_model({
-            "model": "qwen-max-latest",
+            "model": config["llm_name"],
             "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key": os.getenv("DASHSCOPE_API_KEY"),
         })
@@ -47,7 +54,7 @@ class PaperRAGPipeline():
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
 
         model_name = config["embedding_name"]
-        model_kwargs = {'device': 'cuda'}
+        model_kwargs = {'device': 'cpu'}
         encode_kwargs = {'normalize_embeddings': False}
         bge_embeddings = HuggingFaceBgeEmbeddings(
             model_name=model_name,
@@ -107,7 +114,39 @@ class PaperRAGPipeline():
             self.dense_retriever = QdrantRetriever(vector_store, embedding, similarity_top_k=f_topk_1)
             print(f"创建{embedding}密集检索器成功")
         
+        self.stp_words = load_stopwords(str(Path(config["work_dir"]) / "hit_stopwords.txt"))
+        import jieba
+        self.sparse_tk = jieba.Tokenizer()
         self.nodes = nodes
+        
+        f_topk_2 = config['f_topk_2']
+        f_embed_type_2 = config['f_embed_type_2']
+        bm25_type = config['bm25_type']
+        self.sparse_retriever = BM25Retriever.from_defaults(
+            nodes=self.nodes,
+            tokenizer=self.sparse_tk,
+            similarity_top_k=f_topk_2,
+            stopwords=self.stp_words,
+            embed_type=f_embed_type_2,
+            bm25_type=bm25_type,
+        )
+        print("创建BM25稀疏检索器成功")
+        self.retriever = self.sparse_retriever
+
+        # 创建重排器
+        self.reranker = None
+        use_reranker = config['use_reranker']
+        r_topk = config['r_topk']
+        reranker_name = config['reranker_name']
+        r_embed_type = config['r_embed_type']
+        r_embed_bs = config['r_embed_bs']
+        r_use_efficient = config['r_use_efficient']
+        if use_reranker == 1:
+            self.reranker = SentenceTransformerRerank(
+                top_n=r_topk,
+                model=reranker_name,
+            )
+            print(f"创建{reranker_name}重排器成功")
 
         # 创建node快速索引
         self.nodeid2idx = dict()
@@ -124,13 +163,13 @@ class PaperRAGPipeline():
     def build_filters(self, query):
         filters = None
         filter_dict = None
-        if "document" in query and query["document"] != "":
-            dir = query['document']
+        if "paper_id" in query and query["paper_id"] != "":
+            dir = query['paper_id']
             filters = build_qdrant_filters(
                 dir=dir
             )
             filter_dict = {
-                "dir": dir
+                "file_path": dir
             }
         return filters, filter_dict
     
@@ -150,8 +189,8 @@ class PaperRAGPipeline():
         "document": "所属路径" #用于过滤文档，可选
         '''
         self.filters, self.filter_dict = self.build_filters(query)
-        self.dense_retriever.filters = self.filters
-        self.dense_retriever.filter_dict = self.filter_dict
+        self.retriever.filters = self.filters
+        self.retriever.filter_dict = self.filter_dict
         res = await self.generation_with_knowledge_retrieval(
             query_str=query["question"],
             hyde_query=query.get("hyde_query", "")
@@ -164,8 +203,8 @@ class PaperRAGPipeline():
             hyde_query: str = ""
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
-        # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
-        node_with_scores = self.dense_retriever.retrieve(query_bundle)
+        node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
+        # node_with_scores = self.dense_retriever.retrieve(query_bundle)
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
@@ -175,6 +214,9 @@ class PaperRAGPipeline():
             node_with_scores,
             node_with_scores_path,
         ])
+        import ipdb;ipdb.set_trace()
+        if self.reranker:
+            node_with_scores = self.reranker.postprocess_nodes(node_with_scores, query_bundle)
 
         contents = [self.get_node_content(node=node) for node in node_with_scores]
         context_str = "\n\n".join(

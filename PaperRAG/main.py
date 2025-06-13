@@ -6,14 +6,17 @@
 * @function: 
 '''
 import os
+from pathlib import Path
 import fire
 import re
 import json
 from tqdm.asyncio import tqdm
 from copy import deepcopy
+from datetime import datetime
 
 from paperrag.utils import get_yaml_data, read_jsonl
 from paperrag.pipeline import PaperRAGPipeline
+
 
 def change_result(raw_text):
     # 提取 JSON 字符串部分（用正则找出最外层花括号里的部分）
@@ -43,29 +46,36 @@ async def main(
     config = get_yaml_data(config_path)
     for key in config:
         print(f"{key}: {config[key]}")
-    
+
     rag_pipeline = PaperRAGPipeline(
         config
     )
 
-    question_file = "E:/Dataset/TIANCHIPaperRAG/papar_QA_dataset/multi_choice_questions.json"
+    question_file = str(Path(config["work_dir"]) / "papar_QA_dataset/multi_choice_questions.json")
     with open(question_file, encoding="utf-8") as f:
         queries = json.loads(f.read())
     print(f"开始生成答案...")
     results = deepcopy(queries)
+    current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    save_folder = Path(config["work_dir"]) / f"result_{current_time}"
+    save_folder.mkdir(parents=True, exist_ok=True)
     for num, query in enumerate(tqdm(queries, total=len(queries))):
         res = await rag_pipeline.run(query)
         answer = res["answer"]
         answer = change_result(answer)
         if answer is None:
             print(f"id {num}: 输出结果不对".center(60, "*"))
+            answer = ""
         else:
             print(f"id {num}: {answer}")
         results[num]["correct_answer"] = answer
-    save_json = "base_version.json"
-    with open(save_json, "w", encoding="utf-8") as f:
+        save_one_json = save_folder / f"{num}.json"
+        with open(str(save_one_json), "w", encoding="utf-8") as f:
+            json.dump(results[num], f, ensure_ascii=False, indent=4)
+    save_json = Path(save_folder) / "base_version.json"
+    with open(str(save_json), "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
-    
+
 
 if __name__ == "__main__":
     fire.Fire(main)

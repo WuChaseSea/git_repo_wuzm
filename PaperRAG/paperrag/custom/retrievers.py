@@ -1,5 +1,6 @@
 import logging
 import time
+from pathlib import Path
 from typing import List, Optional, Callable, cast
 
 import bm25s
@@ -13,7 +14,7 @@ from llama_index.core.schema import NodeWithScore, BaseNode, IndexNode
 from llama_index.core.storage.docstore import BaseDocumentStore
 from llama_index.core.vector_stores import VectorStoreQuery
 from llama_index.vector_stores.qdrant import QdrantVectorStore
-from ..pipeline.injestion import get_node_content
+from ..pipeline.ingestion import get_node_content
 from nltk import PorterStemmer
 from rank_bm25 import BM25Okapi
 
@@ -197,7 +198,7 @@ class BM25Retriever(BaseRetriever):
             flag = True
             if self.filter_dict is not None:
                 for key, value in self.filter_dict.items():
-                    if self._nodes[ix].metadata[key] != value:
+                    if Path(self._nodes[ix].metadata[key]).parent.name != value:
                         flag = False
                         break
             if flag:

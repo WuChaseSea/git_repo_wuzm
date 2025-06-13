@@ -33,6 +33,7 @@ def read_data(path: str = "data") -> List[Document]:
     )
     return reader.load_data()
 
+
 def merge_strings(A, B):
     # 找到A的结尾和B的开头最长的匹配子串
     max_overlap = 0
@@ -92,6 +93,7 @@ def get_node_content(node: NodeWithScore, embed_type=0, nodes: list[TextNode] = 
             text = ""
     return text
 
+
 def build_preprocess(
         data_path=None,
         chunk_size=1024,
@@ -112,6 +114,7 @@ def build_preprocess(
         # CustomFilePathExtractor(last_path_length=100000, data_path=data_path, metadata_mode=MetadataMode.EMBED),
     ]
     return transformation
+
 
 def build_vector_store(
         qdrant_url: str = "http://localhost:6333",
@@ -143,6 +146,7 @@ def build_vector_store(
         collection_name=collection_name
     )
 
+
 def build_pipeline(
         llm: LLM,
         embed_model: BaseEmbedding,
@@ -166,6 +170,7 @@ def build_pipeline(
         embed_model,
     ])
     return IngestionPipeline(transformations=transformation, vector_store=vector_store)
+
 
 def build_qdrant_filters(dir):
     filters = Filter(
