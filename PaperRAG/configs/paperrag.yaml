@@ -1,7 +1,7 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
 
 # 大语言模型参数
-llm_name: "qwen-plus-1127"
+llm_name: "qwen-plus-0112"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
@@ -24,8 +24,8 @@ collection_name: "ainops24"
 re_only: false  # 只检索，用于调试检索
 retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
 f_topk: 256 # 仅用于混合检索器最终的fusion数量
-f_topk_1: 8
-f_topk_2: 8
+f_topk_1: 32
+f_topk_2: 32
 f_topk_3: 6
 
 # 重排器参数

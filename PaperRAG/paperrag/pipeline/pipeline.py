@@ -214,7 +214,6 @@ class PaperRAGPipeline():
             node_with_scores,
             node_with_scores_path,
         ])
-        import ipdb;ipdb.set_trace()
         if self.reranker:
             node_with_scores = self.reranker.postprocess_nodes(node_with_scores, query_bundle)
 
