@@ -18,9 +18,9 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.langchain import LangchainEmbedding
 from qdrant_client import models
 
-from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE
+from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, QA_TEMPLATE_EN
 from ..custom.retrievers import QdrantRetriever, HybridRetriever, BM25Retriever
-from ..custom.rerankers import SentenceTransformerRerank
+from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
 from .ingestion import get_node_content as _get_node_content
 from .rag import generation as _generation
@@ -31,6 +31,8 @@ def load_stopwords(path):
     with open(path, 'r', encoding='utf-8') as file:
         stopwords = set([line.strip() for line in file])
     return stopwords
+
+from openai import OpenAI
 
 
 class PaperRAGPipeline():
@@ -45,11 +47,17 @@ class PaperRAGPipeline():
         self.ans_refine_type = config['ans_refine_type']
         self.work_dir = config["work_dir"]
         print(f"Pipeline 初始化开始".center(60, "="))
+
         self.llm = get_chat_model({
             "model": config["llm_name"],
             "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key": os.getenv("DASHSCOPE_API_KEY"),
         })
+        # self.llm = OpenAI(
+        #     base_url="https://api.ppinfra.com/v3/openai",
+        #     api_key=os.getenv("PPIO_API_KEY")
+        # )
+
         self.qa_template = self.build_prompt_template(QA_TEMPLATE)
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
 
@@ -131,7 +139,21 @@ class PaperRAGPipeline():
             bm25_type=bm25_type,
         )
         print("创建BM25稀疏检索器成功")
-        self.retriever = self.sparse_retriever
+        # 创建检索器
+        retrieval_type = config["retrieval_type"]
+        if retrieval_type == 1:
+            self.retriever = self.dense_retriever
+        elif retrieval_type == 2:
+            self.retriever = self.sparse_retriever
+        elif retrieval_type == 3:
+            f_topk = config['f_topk']
+            self.retriever = HybridRetriever(
+                dense_retriever=self.dense_retriever,
+                sparse_retriever=self.sparse_retriever,
+                retrieval_type=retrieval_type,  # 1-dense 2-sparse 3-hybrid
+                topk=f_topk,
+            )
+            print("创建混合检索器成功")
 
         # 创建重排器
         self.reranker = None
@@ -147,6 +169,15 @@ class PaperRAGPipeline():
                 model=reranker_name,
             )
             print(f"创建{reranker_name}重排器成功")
+        elif use_reranker == 2:
+            self.reranker = LLMRerank(
+                top_n=r_topk,
+                model=reranker_name,
+                embed_bs=r_embed_bs,  # 控制重排器批大小，减小显存占用
+                embed_type=r_embed_type,
+                use_efficient=r_use_efficient,
+            )
+            print(f"创建{reranker_name}LLM重排器成功")
 
         # 创建node快速索引
         self.nodeid2idx = dict()
@@ -203,13 +234,16 @@ class PaperRAGPipeline():
             hyde_query: str = ""
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
-        node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
-        # node_with_scores = self.dense_retriever.retrieve(query_bundle)
+        # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
+        
+        node_with_scores = self.dense_retriever.retrieve(query_bundle)
+        # node_with_scores = await self.retriever.aretrieve(query_bundle)
+        
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
             node_with_scores_path = []
-
+        
         node_with_scores = HybridRetriever.fusion([
             node_with_scores,
             node_with_scores_path,

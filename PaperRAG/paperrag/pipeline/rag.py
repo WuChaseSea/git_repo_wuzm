@@ -26,6 +26,24 @@ def filter_specfic_words(prompt):
 async def generation(llm, fmt_qa_prompt):
     cnt = 0
     # fmt_qa_prompt = filter_specfic_words(fmt_qa_prompt)
+    # stream = False
+    # max_tokens = 1000
+    # response_format = { "type": "text" }
+    # chat_completion_res = llm.chat.completions.create(
+    #     model="deepseek/deepseek-r1-distill-qwen-32b",
+    #     messages=[
+    #         {
+    #             "role": "user",
+    #             "content": fmt_qa_prompt,
+    #         }
+    #     ],
+    #     stream=stream,
+    #     extra_body={
+
+    #     }
+    # )
+    # return chat_completion_res.choices[0].message.content
+
     while True:
         try:
             messages = [{

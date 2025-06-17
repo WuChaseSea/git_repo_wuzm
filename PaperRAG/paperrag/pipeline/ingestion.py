@@ -20,6 +20,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 
 from ..custom.reader import SimpleDirectoryReader
+from ..custom.hierarchical import HierarchicalNodeParser
 
 
 def read_data(path: str = "data") -> List[Document]:
@@ -107,7 +108,10 @@ def build_preprocess(
             include_prev_next_rel=True,
         )
     else:
-        parser = None
+        parser = HierarchicalNodeParser.from_defaults(
+            chunk_sizes=[chunk_size * 4, chunk_size],
+            chunk_overlap=chunk_overlap,
+        )
     transformation = [
         parser,
         # CustomTitleExtractor(metadata_mode=MetadataMode.EMBED),

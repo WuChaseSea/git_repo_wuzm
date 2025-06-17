@@ -1,38 +1,38 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
 
 # 大语言模型参数
-llm_name: "qwen-plus-0112"
+llm_name: "qwen-plus-latest"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
 data_path: "papar_QA_dataset/papers"
 
 # 分块策略
-split_type: 0 # 0-->Sentence 1-->Hierarchical
-chunk_size: 1024
-chunk_overlap: 50
+split_type: 1 # 0-->Sentence 1-->Hierarchical
+chunk_size: 512
+chunk_overlap: 128
 
 # 密集检索器参数
 qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-base-en-v1.5"
 vector_size: 768
-cache_path: "cache_bge_base_en_new"
+cache_path: "cache_bge_base_en_new_512_stru"
 collection_name: "ainops24"
 
 # 粗排参数
 re_only: false  # 只检索，用于调试检索
-retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
-f_topk: 256 # 仅用于混合检索器最终的fusion数量
-f_topk_1: 32
-f_topk_2: 32
+retrieval_type: 1 # 1-->密集 2-->稀疏 3-->混合
+f_topk: 8 # 仅用于混合检索器最终的fusion数量
+f_topk_1: 8
+f_topk_2: 8
 f_topk_3: 6
 
 # 重排器参数
 r_topk: 6 # 精排topk
 r_topk_1: 6 # 精排后Fusion的topk
 reranker_name: "/Users/wuzm/Documents/CodeRepository/Models/reranker/bge-reranker-v2-m3"
-use_reranker: 1 # 0-->不使用 1-->ST的普通Reranker 2-->bge LLM Reranker
+use_reranker: 0 # 0-->不使用 1-->ST的普通Reranker 2-->bge LLM Reranker
 r_embed_bs: 32
 r_use_efficient: 0 # 0-->不加速 1-->使用最大值选择方法加速 2-->使用熵选择方法加速
 

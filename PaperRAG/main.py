@@ -60,6 +60,8 @@ async def main(
     save_folder = Path(config["work_dir"]) / f"result_{current_time}"
     save_folder.mkdir(parents=True, exist_ok=True)
     for num, query in enumerate(tqdm(queries, total=len(queries))):
+        if num != 3:
+            continue
         res = await rag_pipeline.run(query)
         answer = res["answer"]
         answer = change_result(answer)

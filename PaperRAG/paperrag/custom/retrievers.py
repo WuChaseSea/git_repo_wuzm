@@ -265,7 +265,7 @@ class HybridRetriever(BaseRetriever):
                 text_to_node[content] = item
                 rrf_map[content] += 1 / (rank + K)
         sorted_items = sorted(rrf_map.items(), key=lambda x: x[1], reverse=True)
-
+        
         reranked_nodes: List[NodeWithScore] = []
         for text, score in sorted_items:
             reranked_nodes.append(text_to_node[text])
@@ -282,7 +282,7 @@ class HybridRetriever(BaseRetriever):
                 return sparse_nodes
         if self.retrieval_type != 2:
             self.dense_retriever.filters = self.filters
-            dense_nodes = await self.dense_retriever.aretrieve(query_bundle)
+            dense_nodes = self.dense_retriever.retrieve(query_bundle)
             if self.retrieval_type == 1:
                 return dense_nodes
 

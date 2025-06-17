@@ -136,6 +136,12 @@ class LLMRerank(BaseNodePostprocessor):
             use_efficient: int = 0
     ):
         device = infer_torch_device() if device is None else device
+        super().__init__(
+            top_n=top_n,
+            model=model,
+            device=device,
+            keep_retrieval_score=keep_retrieval_score,
+        )
 
         self._tokenizer = AutoTokenizer.from_pretrained(model, trust_remote_code=True)
         self._yes_loc = self._tokenizer('Yes', add_special_tokens=False)['input_ids'][0]
@@ -184,12 +190,6 @@ class LLMRerank(BaseNodePostprocessor):
             self._model.eval()
             self._type = 0
         self._embed_bs = embed_bs
-        super().__init__(
-            top_n=top_n,
-            model=model,
-            device=device,
-            keep_retrieval_score=keep_retrieval_score,
-        )
 
     def last_logit_pool(self, logits: torch.Tensor,
                         attention_mask: torch.Tensor) -> torch.Tensor:

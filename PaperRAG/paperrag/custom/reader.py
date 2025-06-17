@@ -234,6 +234,9 @@ class PDFReader(BaseReader):
         Initialize PDFReader.
         """
         self.return_full_document = return_full_document
+        import logging
+        logging.getLogger("pdfminer").setLevel(logging.ERROR)
+
 
     def safe_text(self, text):
         try:
@@ -241,6 +244,16 @@ class PDFReader(BaseReader):
         except Exception:
             # fallback，清除所有非法字符
             return re.sub(r'[\ud800-\udfff]', '', text)
+    
+    def clean_text(self, text: str) -> str:
+        # 合并行内换行，保留段落间空行
+        text = re.sub(r'(?<!\n)\n(?!\n)', ' ', text)
+        text = re.sub(r'\n{3,}', '\n\n', text)  # 避免连续太多换行
+        # 去除页码等信息
+        text = re.sub(r'Page \d+|^Copyright.*?\n', '', text, flags=re.IGNORECASE)
+        # 压缩多余空格
+        text = re.sub(r'[ \t]+', ' ', text)
+        return text.strip()
 
     # @retry(
     #     stop=stop_after_attempt(RETRY_TIMES),
@@ -257,11 +270,15 @@ class PDFReader(BaseReader):
 
         try:
             import pypdf
+            import pdfplumber, re
+            import fitz
         except ImportError:
             raise ImportError(
                 "pypdf is required to read PDF files: `pip install pypdf`"
             )
+        
         fs = fs or get_default_fs()
+        
         with fs.open(str(file), "rb") as fp:
             # Load the file in memory if the filesystem is not the default one to avoid
             # issues with pypdf
@@ -291,7 +308,6 @@ class PDFReader(BaseReader):
             # This block returns each page of a PDF as its own Document
             else:
                 # Iterate over every page
-
                 for page in range(num_pages):
                     # Extract the text from the page
                     page_text = pdf.pages[page].extract_text()
@@ -304,6 +320,52 @@ class PDFReader(BaseReader):
                     docs.append(Document(text=self.safe_text(page_text), metadata=metadata))
 
             return docs
+        '''
+        docs = []
+        with pdfplumber.open(file) as pdf:
+            metadata = {"file_name": file.name}
+            if extra_info:
+                metadata.update(extra_info)
+
+            if self.return_full_document:
+                full_text = "\n".join(
+                    self.clean_text(self.safe_text(page.extract_text() or ""))
+                    for page in pdf.pages
+                )
+                docs.append(Document(text=full_text, metadata=metadata))
+            else:
+                for i, page in enumerate(pdf.pages):
+                    page_text = page.extract_text() or ""
+                    page_text = self.clean_text(self.safe_text(page_text))
+                    docs.append(Document(
+                        text=page_text,
+                        metadata={**metadata, "page_number": i + 1}
+                    ))
+
+        return docs'''
+        '''
+        docs = []
+        metadata = {"file_name": file.name}
+        if extra_info:
+            metadata.update(extra_info)
+
+        with fitz.open(file) as pdf:
+            if self.return_full_document:
+                full_text = "\n".join(
+                    self.clean_text(self.safe_text(page.get_text("text") or ""))
+                    for page in pdf
+                )
+                docs.append(Document(text=full_text, metadata=metadata))
+            else:
+                for i, page in enumerate(pdf):
+                    page_text = page.get_text("text") or ""
+                    page_text = self.clean_text(self.safe_text(page_text))
+                    docs.append(Document(
+                        text=page_text,
+                        metadata={**metadata, "page_number": i + 1}
+                    ))
+
+        return docs'''
 
 
 class SimpleDirectoryReader(BaseReader, ResourcesReaderMixin, FileSystemReaderMixin):
