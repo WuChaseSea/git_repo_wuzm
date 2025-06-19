@@ -39,5 +39,6 @@ filtered_docs = [el for el in elements if is_valid_content(el)]
 
 # 输出正文
 for doc in filtered_docs:
+    import ipdb;ipdb.set_trace()
     print(doc.page_content)
 

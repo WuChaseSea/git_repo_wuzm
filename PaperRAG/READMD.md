@@ -17,6 +17,10 @@ bge-base-en-v1.5 bm25检索 top32 bge-reranker-v2-minicpm-layerwise rerank top6 
 
 chunk 512 overlap 128
 bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25)
+bge-base-en-v1.5 bm25检索 top16 0.4222 (qwen-plus-latest)
+bge-base-en-v1.5 bm25检索 top16 bge-reranker-v2-m3 rerank top8 0.4267 (qwen-plus-latest)
+bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top8，然后进行合并，rerank top8 0.3778 (qwen-plus-latest)
+bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top2，然后进行合并 0.3956 (qwen-plus-latest)
 bge-base-en-v1.5 密集检索 top8 0.4000 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 top32 bge-reranker-v2-m3 rerank top6 0.4089 (qwen-plus-2025-01-25)
 bge-base-en-v1.5 bm25检索 top8 密集检索 top8 混合检索 top8 bge-reranker-v2-m3 rerank top6 0.4178 (qwen-plus-2025-04-28)
@@ -34,3 +38,6 @@ bge-base-en-v1.5 bm25检索 top8 0.3733 (qwen-plus-latest) base_version_0617_1 b
 
 使用pypdf
 bge-base-en-v1.5 bm25检索 top8 0.3467 deepseek/deepseek-r1-distill-qwen-32b
+
+使用UnstructuredPDFLoader
+bge-base-en-v1.5 hierarchical 密集检索 top8 0.3378 (qwen-plus-latest)

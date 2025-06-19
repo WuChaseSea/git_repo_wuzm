@@ -8,7 +8,7 @@ llm_embed_type: 3 # 最终的上下文文档编码参数
 data_path: "papar_QA_dataset/papers"
 
 # 分块策略
-split_type: 1 # 0-->Sentence 1-->Hierarchical
+split_type: 0 # 0-->Sentence 1-->Hierarchical
 chunk_size: 512
 chunk_overlap: 128
 
@@ -17,19 +17,19 @@ qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-base-en-v1.5"
 vector_size: 768
-cache_path: "cache_bge_base_en_new_512_stru"
+cache_path: "cache_bge_base_en_new_512"
 collection_name: "ainops24"
 
 # 粗排参数
 re_only: false  # 只检索，用于调试检索
-retrieval_type: 1 # 1-->密集 2-->稀疏 3-->混合
+retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
 f_topk: 8 # 仅用于混合检索器最终的fusion数量
 f_topk_1: 8
-f_topk_2: 8
+f_topk_2: 2
 f_topk_3: 6
 
 # 重排器参数
-r_topk: 6 # 精排topk
+r_topk: 8 # 精排topk
 r_topk_1: 6 # 精排后Fusion的topk
 reranker_name: "/Users/wuzm/Documents/CodeRepository/Models/reranker/bge-reranker-v2-m3"
 use_reranker: 0 # 0-->不使用 1-->ST的普通Reranker 2-->bge LLM Reranker

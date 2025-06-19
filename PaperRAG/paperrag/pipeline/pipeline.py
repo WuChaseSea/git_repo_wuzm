@@ -9,6 +9,7 @@ import os, sys
 import re
 from pathlib import Path
 from tqdm import tqdm
+import pickle
 import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
 
@@ -76,7 +77,13 @@ class PaperRAGPipeline():
         data_path = os.path.join(self.work_dir, config["data_path"])
         chunk_size = config["chunk_size"]
         chunk_overlap = config["chunk_overlap"]
-        data = read_data(data_path)
+        if not Path("documents.pkl").exists():
+            data = read_data(data_path)
+            with open("documents.pkl", "wb") as f:
+                pickle.dump(data, f)
+        else:
+            with open("documents.pkl", "rb") as f:
+                data = pickle.load(f)
         print(f"文档读入完成，一共有 {len(data)} 个文档.")
 
         vector_store = None
@@ -222,11 +229,71 @@ class PaperRAGPipeline():
         self.filters, self.filter_dict = self.build_filters(query)
         self.retriever.filters = self.filters
         self.retriever.filter_dict = self.filter_dict
-        res = await self.generation_with_knowledge_retrieval(
+        res = await self.generation_with_knowledge_retrieval_four(
             query_str=query["question"],
             hyde_query=query.get("hyde_query", "")
         )
         return res
+    
+    async def generation_with_knowledge_retrieval_four(
+            self,
+            query_str,
+            hyde_query
+    ):
+        question_str = query_str.split('A.')[0].strip()
+        answer_a = query_str.split('A.')[1].split('B.')[0].strip()
+        answer_b = query_str.split('A.')[1].split('B.')[1].split('C.')[0].strip()
+        answer_c = query_str.split('A.')[1].split('B.')[1].split('C.')[1].split('D.')[0].strip()
+        answer_d = query_str.split('D.')[1].strip()
+        query_bundle = self.build_query_bundle(question_str)
+        answer_a_bundle = self.build_query_bundle(answer_a)
+        answer_b_bundle = self.build_query_bundle(answer_b)
+        answer_c_bundle = self.build_query_bundle(answer_c)
+        answer_d_bundle = self.build_query_bundle(answer_d)
+        nodes_query = await self.retriever.aretrieve(query_bundle)
+        nodes_a = await self.retriever.aretrieve(answer_a_bundle)
+        nodes_b = await self.retriever.aretrieve(answer_b_bundle)
+        nodes_c = await self.retriever.aretrieve(answer_c_bundle)
+        nodes_d = await self.retriever.aretrieve(answer_d_bundle)
+        node_with_scores = []
+        node_with_scores.extend(nodes_query)
+        node_with_scores.extend(nodes_a)
+        node_with_scores.extend(nodes_b)
+        node_with_scores.extend(nodes_c)
+        node_with_scores.extend(nodes_d)
+        if self.path_retriever is not None:
+            node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
+        else:
+            node_with_scores_path = []
+        
+        node_with_scores = HybridRetriever.fusion([
+            node_with_scores,
+            node_with_scores_path,
+        ])
+        if self.reranker:
+            node_with_scores = self.reranker.postprocess_nodes(node_with_scores, query_bundle)
+
+        contents = [self.get_node_content(node=node) for node in node_with_scores]
+        context_str = "\n\n".join(
+            [f"### 文档{i}: {content}" for i, content in enumerate(contents)]
+        )
+        if self.re_only:
+            return {"answer": "", "nodes": node_with_scores, "contexts": contents}
+        fmt_qa_prompt = self.qa_template.format(
+            context_str=context_str, query_str=query_str
+        )
+        ret = await self.generation(self.llm, fmt_qa_prompt)
+        if self.ans_refine_type == 1:
+            fmt_merge_prompt = self.merge_template.format(
+                context_str=contents[0], query_str=query_str, answer_str=ret.text
+            )
+            ret = await self.generation(self.llm, fmt_merge_prompt)
+        elif self.ans_refine_type == 2:
+            ret.text = ret.text + "\n\n" + contents[0]
+        return {"answer": ret, "nodes": node_with_scores, "contexts": contents}
+
+
+        
 
     async def generation_with_knowledge_retrieval(
             self,
@@ -236,8 +303,8 @@ class PaperRAGPipeline():
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         
-        node_with_scores = self.dense_retriever.retrieve(query_bundle)
-        # node_with_scores = await self.retriever.aretrieve(query_bundle)
+        # node_with_scores = self.dense_retriever.retrieve(query_bundle)
+        node_with_scores = await self.retriever.aretrieve(query_bundle)
         
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)

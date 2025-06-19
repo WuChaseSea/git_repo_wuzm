@@ -58,10 +58,17 @@ async def main(
     results = deepcopy(queries)
     current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     save_folder = Path(config["work_dir"]) / f"result_{current_time}"
+    
+    # save_folder = Path(config["work_dir"]) / f"result_2025-06-19_20-45-51"
     save_folder.mkdir(parents=True, exist_ok=True)
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        if num != 3:
-            continue
+        # if num < 300:
+        #     save_one_json = save_folder / f"{num}.json"
+        #     with open(save_one_json, encoding="utf-8") as f:
+        #         answer = json.loads(f.read())
+        #     results[num]["correct_answer"] = answer['correct_answer']
+        #     continue
+        # import ipdb;ipdb.set_trace()
         res = await rag_pipeline.run(query)
         answer = res["answer"]
         answer = change_result(answer)
