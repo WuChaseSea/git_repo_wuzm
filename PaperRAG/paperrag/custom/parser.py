@@ -99,7 +99,7 @@ class PDFParser:
         return DocumentConverter(format_options=format_options)
 
     def convert_documents(self, input_doc_paths: List[Path]) -> Iterable[ConversionResult]:
-        conv_results = self.doc_converter.convert_all(source=input_doc_paths)
+        conv_results = self.doc_converter.convert(source=input_doc_paths)
         return conv_results
     
     def process_documents(self, conv_results: Iterable[ConversionResult]):
@@ -107,7 +107,7 @@ class PDFParser:
             self.output_dir.mkdir(parents=True, exist_ok=True)
         success_count = 0
         failure_count = 0
-
+        
         for conv_res in conv_results:
             if conv_res.status == ConversionStatus.SUCCESS:
                 success_count += 1
