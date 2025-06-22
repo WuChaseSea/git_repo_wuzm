@@ -5,7 +5,7 @@
 baseline
 chunk 1024 overlap 50
 bge-base-zh-v1.5 密集检索 top32 0.3956  (qwen-max)
-bge-base-en-v1.5 密集检索 top32 0.4311  (qwen-max-2025-01-25)
+**bge-base-en-v1.5 密集检索 top32 0.4311  (qwen-max-2025-01-25)**
 bge-base-en-v1.5 密集检索 top8 0.4000 (qwen-plus)
 bge-base-en-v1.5 bm25检索 top8 0.4044 (qwen-plus-1125)
 
@@ -16,7 +16,7 @@ bge-base-en-v1.5 bm25检索 top32 bge-reranker-v2-m3 rerank top6 0.3733 (qwen-pl
 bge-base-en-v1.5 bm25检索 top32 bge-reranker-v2-minicpm-layerwise rerank top6 0.3733 (qwen-plus-0112)
 
 chunk 512 overlap 128
-bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25)
+**bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25)**
 bge-base-en-v1.5 bm25检索 top16 0.4222 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 top16 bge-reranker-v2-m3 rerank top8 0.4267 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top8，然后进行合并，rerank top8 0.3778 (qwen-plus-latest)
@@ -41,3 +41,7 @@ bge-base-en-v1.5 bm25检索 top8 0.3467 deepseek/deepseek-r1-distill-qwen-32b
 
 使用UnstructuredPDFLoader
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.3378 (qwen-plus-latest)
+
+VL实验
+colpali-v1.2 top8 qwen-vl-plus 0.3156
+colpali-v1.2 top8 qwen-vl-max-latest 0.3733

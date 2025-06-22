@@ -10,10 +10,13 @@ import requests
 from pathlib import Path
 from pdf2image import convert_from_path
 from byaldi import RAGMultiModalModel
+from openai import OpenAI
 
 
-pdfs_dir = "/Volumes/wuzhaoming/Dataset/RAG/InstructionPDFs"
-model_dir = "/Volumes/wuzhaoming/Models/VLRAG"
+# pdfs_dir = "/Volumes/wuzhaoming/Dataset/RAG/InstructionPDFs"
+# model_dir = "/Volumes/wuzhaoming/Models/VLRAG"
+pdfs_dir = "E:/Dataset/RAG/InstructionPDFs"
+model_dir = "E:/Models/VLRAG"
 
 pdfs = {
     "MALM": str(Path(pdfs_dir) / "pdfs" / "malm-4-drawer-chest-white__AA-2398381-2-100.pdf"),
@@ -36,14 +39,21 @@ def convert_pdfs_to_images(pdf_folder):
     return all_images
 
 all_images = convert_pdfs_to_images(str(Path(pdfs_dir) / "pdfs"))
+index_name = "image_index"
+if (Path(".byaldi") / index_name).exists():
+    docs_retrieval_model = RAGMultiModalModel.from_index(index_name)
+else:
+    docs_retrieval_model = RAGMultiModalModel.from_pretrained(str(Path(model_dir) / "colpali-v1.2"))
+    docs_retrieval_model.index(
+        input_path=str(Path(pdfs_dir) / "pdfs"),
+        index_name=index_name,
+        store_collection_with_index=True,
+        overwrite=True
+    )
 
-docs_retrieval_model = RAGMultiModalModel.from_pretrained(str(Path(model_dir) / "colpali-v1.2"))
-docs_retrieval_model.index(
-    input_path=str(Path(pdfs_dir) / "pdfs"), index_name="image_index", store_collection_with_index=False, overwrite=True
-)
 text_query = "How many people are needed to assemble the Malm?"
-
-results = docs_retrieval_model.search(text_query, k=3)
+topk = 3
+results = docs_retrieval_model.search(text_query, k=topk)
 
 def get_grouped_images(results, all_images):
     grouped_images = []
@@ -57,5 +67,23 @@ def get_grouped_images(results, all_images):
 
     return grouped_images
 
-import ipdb;ipdb.set_trace()
 grouped_images = get_grouped_images(results, all_images)
+
+client = OpenAI(
+    # 若没有配置环境变量，请用百炼API Key将下行替换为：api_key="sk-xxx",
+    api_key=os.getenv("DASHSCOPE_API_KEY"),
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
+chat_template = [
+        {
+            "role": "user",
+            "content": [{"type": "image_url", "image_url": {"url": f"data:image/png;base64,{result['base64']}"}} for result in results]
+            + [{"type": "text", "text": text_query}],
+        }
+    ]
+completion = client.chat.completions.create(
+    model="qwen-vl-max",  # 此处以qwen-vl-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
+    messages=chat_template
+)
+response = completion.choices[0].message.content
+print(f"{response}")
