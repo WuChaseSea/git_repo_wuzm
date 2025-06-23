@@ -1,1 +1,2 @@
 from .pipeline import PaperRAGPipeline
+from .pipeline_challenge import PaperRAGChallengePipeline

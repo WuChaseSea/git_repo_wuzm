@@ -20,6 +20,7 @@ from docling.backend.docling_parse_v2_backend import DoclingParseV2DocumentBacke
 from docling.datamodel.base_models import ConversionStatus
 from docling.datamodel.document import ConversionResult
 
+logging.basicConfig(level=logging.INFO)
 _log = logging.getLogger(__name__)
 
 def _process_chunk(pdf_paths, pdf_backend, output_dir, num_threads, metadata_lookup, debug_data_path):
@@ -80,7 +81,8 @@ class PDFParser:
         from docling.datamodel.base_models import InputFormat
         from docling.pipeline.standard_pdf_pipeline import StandardPdfPipeline
         
-        pipeline_options = PdfPipelineOptions()
+        pdf_artifacts_path = "/Volumes/wuzhaoming/Models/VLRAG/docling-models"
+        pipeline_options = PdfPipelineOptions(artifacts_path=pdf_artifacts_path)
         pipeline_options.do_ocr = True
         ocr_options = EasyOcrOptions(lang=['en'], force_full_page_ocr=False)
         pipeline_options.ocr_options = ocr_options
@@ -99,7 +101,7 @@ class PDFParser:
         return DocumentConverter(format_options=format_options)
 
     def convert_documents(self, input_doc_paths: List[Path]) -> Iterable[ConversionResult]:
-        conv_results = self.doc_converter.convert(source=input_doc_paths)
+        conv_results = self.doc_converter.convert_all(source=input_doc_paths)
         return conv_results
     
     def process_documents(self, conv_results: Iterable[ConversionResult]):
@@ -109,6 +111,9 @@ class PDFParser:
         failure_count = 0
         
         for conv_res in conv_results:
+            if Path(self.output_dir / f"{conv_res.input.file.stem}.json").exists():
+                _log.info(f"Document {conv_res.input.file} already converted.")
+                continue
             if conv_res.status == ConversionStatus.SUCCESS:
                 success_count += 1
                 processor = JsonReportProcessor(metadata_lookup=self.metadata_lookup, debug_data_path=self.debug_data_path)
@@ -163,7 +168,8 @@ class PDFParser:
     def parse_and_export(self, input_doc_paths: List[Path] = None, doc_dir: Path = None):
         start_time = time.time()
         if input_doc_paths is None and doc_dir is not None:
-            input_doc_paths = list(doc_dir.glob("*.pdf"))
+            # input_doc_paths = list(doc_dir.rglob("*.pdf"))
+            input_doc_paths = [f for f in doc_dir.rglob("*.pdf") if not f.name.startswith("._")]
         
         total_docs = len(input_doc_paths)
         _log.info(f"Starting to process {total_docs} documents")
@@ -264,7 +270,7 @@ class JsonReportProcessor:
         assembled_report = {}
         assembled_report['metainfo'] = self.assemble_metainfo(data)
         assembled_report['content'] = self.assemble_content(data)
-        assembled_report['tables'] = self.assemble_tables(conv_result.document.tables, data)
+        assembled_report['tables'] = self.assemble_tables(conv_result.document.tables, conv_result.document, data)
         assembled_report['pictures'] = self.assemble_pictures(data)
         self.debug_data(data)
         return assembled_report
@@ -438,12 +444,12 @@ class JsonReportProcessor:
         sorted_pages = [pages[page_num] for page_num in sorted(pages.keys())]
         return sorted_pages
 
-    def assemble_tables(self, tables, data):
+    def assemble_tables(self, tables, doc, data):
         assembled_tables = []
         for i, table in enumerate(tables):
             table_json_obj = table.model_dump()
             table_md = self._table_to_md(table_json_obj)
-            table_html = table.export_to_html()
+            table_html = table.export_to_html(doc=doc)
             
             table_data = data['tables'][i]
             table_page_num = table_data['prov'][0]['page_no']

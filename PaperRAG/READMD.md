@@ -28,6 +28,15 @@ bge-base-en-v1.5 bm25检索 top8 密集检索 top8 混合检索 top8 0.3911 (qwe
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.4089 (qwen-plus-latest)
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.3644 en-template (qwen-plus-latest)
 
+chunk 300 overlap 50
+bge-base-en-v1.5 密集检索 top8 0.3778 (qwen-plus-latest)
+bge-base-en-v1.5 密集检索 top32 0.4000 (qwen-plus-latest)
+bge-base-en-v1.5 bm25 top8 0.3822 (qwen-plus-latest)
+bge-base-en-v1.5 bm25 top32 0.3778 (qwen-plus-latest)
+
+chunk 512 overlap 128
+bge-base-en-v1.5 bm25 top8 0.3733 (qwen-plus-latest)
+
 使用pdfplumber
 bge-base-en-v1.5 bm25检索 top8 密集检索 top8 混合检索 top8 0.3822 (qwen-plus-2025-04-28) base_version_1.json
 bge-base-en-v1.5 bm25检索 top8  0.3556 (qwen-plus-2025-04-28) base_version_2.json
