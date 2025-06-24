@@ -18,6 +18,8 @@ bge-base-en-v1.5 bm25检索 top32 bge-reranker-v2-minicpm-layerwise rerank top6 
 chunk 512 overlap 128
 **bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25)**
 bge-base-en-v1.5 bm25检索 top16 0.4222 (qwen-plus-latest)
+bge-base-en-v1.5 密集检索 top32 0.3733 (qwen-plus-latest)
+bge-base-en-v1.5 bm25检索 top8 0.3733 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 top16 bge-reranker-v2-m3 rerank top8 0.4267 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top8，然后进行合并，rerank top8 0.3778 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top2，然后进行合并 0.3956 (qwen-plus-latest)
@@ -28,11 +30,13 @@ bge-base-en-v1.5 bm25检索 top8 密集检索 top8 混合检索 top8 0.3911 (qwe
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.4089 (qwen-plus-latest)
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.3644 en-template (qwen-plus-latest)
 
+
+
 chunk 300 overlap 50
 bge-base-en-v1.5 密集检索 top8 0.3778 (qwen-plus-latest)
-bge-base-en-v1.5 密集检索 top32 0.4000 (qwen-plus-latest)
+bge-base-en-v1.5 密集检索 top32 0.4000 (qwen-plus-latest) 添加rerank，使用LLM分数评判，仅提交前30个 0.0622
 bge-base-en-v1.5 bm25 top8 0.3822 (qwen-plus-latest)
-bge-base-en-v1.5 bm25 top32 0.3778 (qwen-plus-latest)
+bge-base-en-v1.5 bm25 top32 0.3778 (qwen-plus-latest)  仅提交前30个 0.08
 
 chunk 512 overlap 128
 bge-base-en-v1.5 bm25 top8 0.3733 (qwen-plus-latest)

@@ -10,7 +10,7 @@ from pathlib import Path
 import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
 
-from llama_index.core import Settings, PromptTemplate
+from llama_index.core import Settings, PromptTemplate, QueryBundle
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 from llama_index.embeddings.langchain import LangchainEmbedding
 
@@ -18,8 +18,9 @@ from .ingestion import VectorDBIngestor, BM25Ingestor
 from ..custom.parser import PDFParser
 from ..custom.parsed_reports_merging import PageTextPreparation
 from ..custom.text_splitter import TextSplitter
-from ..custom.retrievers_challenge import VectorRetriever, BM25Retriever
+from ..custom.retrievers_challenge import VectorRetriever, BM25Retriever, HybridRetriever
 from ..custom.template import QA_TEMPLATE
+from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .rag import generation as _generation
 
 class PaperRAGChallengePipeline():
@@ -56,17 +57,23 @@ class PaperRAGChallengePipeline():
         # self.merge_reports()
         self.reports_markdown_path = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "03_reports_markdown"
         # self.export_reports_to_markdown()
-        self.documents_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "chunked_reports_512"
-        self.chunk_reports()
-        self.vector_db_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "vector_dbs_512"
-        self.create_vector_dbs(embedding_model=self.embedding)
+        self.documents_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "chunked_reports"
+        # self.chunk_reports()
+        self.vector_db_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "vector_dbs"
+        # self.create_vector_dbs(embedding_model=self.embedding)
         self.bm25_db_path = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "bm25_dbs"
         # self.create_bm25_db()
-        self.retriever = VectorRetriever(
-                embedding_model=self.embedding,
-                vector_db_dir=self.vector_db_dir,
-                documents_dir=self.documents_dir
-            )
+        # self.retriever = VectorRetriever(
+        #         embedding_model=self.embedding,
+        #         vector_db_dir=self.vector_db_dir,
+        #         documents_dir=self.documents_dir
+        #     )
+        self.retriever = HybridRetriever(
+            embedding_model=self.embedding,
+            vector_db_dir=self.vector_db_dir,
+            documents_dir=self.documents_dir,
+            llm=self.llm
+        )
         # self.retriever = BM25Retriever(
         #     bm25_db_dir=self.bm25_db_path,
         #     documents_dir=self.documents_dir
@@ -146,13 +153,17 @@ class PaperRAGChallengePipeline():
             
         return "\n\n---\n\n".join(context_parts)
     
+    def build_query_bundle(self, query_str):
+        query_bundle = QueryBundle(query_str=query_str)
+        return query_bundle
+    
     async def process_quesiton(self, query):
         paper_folder_path = Path(self.config["work_dir"]) / Path(self.config["data_path"]) / query["paper_id"]
         pdfs = [f for f in paper_folder_path.rglob("*.pdf") if not f.name.startswith("._")]
         retrieval_results = self.retriever.retrieve_by_company_name(
             pdfs[0],
             query["question"],
-            top_n=8
+            top_n=4
         )
         if not retrieval_results:
             raise ValueError("No relevant context found")

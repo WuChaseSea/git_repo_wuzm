@@ -229,7 +229,7 @@ class PaperRAGPipeline():
         self.filters, self.filter_dict = self.build_filters(query)
         self.retriever.filters = self.filters
         self.retriever.filter_dict = self.filter_dict
-        res = await self.generation_with_knowledge_retrieval_four(
+        res = await self.generation_with_knowledge_retrieval(
             query_str=query["question"],
             hyde_query=query.get("hyde_query", "")
         )

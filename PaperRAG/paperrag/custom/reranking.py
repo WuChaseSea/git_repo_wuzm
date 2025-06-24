@@ -1,5 +1,5 @@
 
-import os
+import os, re
 from dotenv import load_dotenv
 from openai import OpenAI
 import requests
@@ -32,8 +32,8 @@ class JinaReranker:
         return response.json()
 
 class LLMReranker:
-    def __init__(self):
-        self.llm = self.set_up_llm()
+    def __init__(self, llm):
+        self.llm = llm
         self.system_prompt_rerank_single_block = prompts.RerankingPrompt.system_prompt_rerank_single_block
         self.system_prompt_rerank_multiple_blocks = prompts.RerankingPrompt.system_prompt_rerank_multiple_blocks
         self.schema_for_single_block = prompts.RetrievalRankingSingleBlock
@@ -47,18 +47,43 @@ class LLMReranker:
     def get_rank_for_single_block(self, query, retrieved_document):
         user_prompt = f'/nHere is the query:/n"{query}"/n/nHere is the retrieved text block:/n"""/n{retrieved_document}/n"""/n'
         
-        completion = self.llm.beta.chat.completions.parse(
-            model="gpt-4o-mini-2024-07-18",
-            temperature=0,
-            messages=[
-                {"role": "system", "content": self.system_prompt_rerank_single_block},
-                {"role": "user", "content": user_prompt},
-            ],
-            response_format=self.schema_for_single_block
+        messages = [
+            {"role": "system", "content": self.system_prompt_rerank_single_block},
+            {'role': 'user', 'content': user_prompt}
+        ]
+        responses = {}
+        for responses in self.llm.chat(messages=messages, stream=True):
+            pass
+        response = responses[0]["content"]
+        # 正则表达式匹配 Reasoning 和 Relevance Score
+        pattern = re.compile(
+            r"### Reasoning:\s*(.+?)\s*### Relevance Score:\s*([0-9.]+)",
+            re.DOTALL
         )
 
-        response = completion.choices[0].message.parsed
-        response_dict = response.model_dump()
+        match = pattern.search(response)
+        if match:
+            reasoning = match.group(1).strip()
+            score = float(match.group(2))
+        else:
+            reasoning = ""
+            score = 0.5
+        response_dict = {
+            "reasoning": reasoning,
+            "relevance_score": score
+        }
+        # completion = self.llm.beta.chat.completions.parse(
+        #     model="gpt-4o-mini-2024-07-18",
+        #     temperature=0,
+        #     messages=[
+        #         {"role": "system", "content": self.system_prompt_rerank_single_block},
+        #         {"role": "user", "content": user_prompt},
+        #     ],
+        #     response_format=self.schema_for_single_block
+        # )
+
+        # response = completion.choices[0].message.parsed
+        # response_dict = response.model_dump()
         
         return response_dict
 
@@ -111,8 +136,11 @@ class LLMReranker:
                 return doc_with_score
 
             # Process all documents in parallel using single-block method
-            with ThreadPoolExecutor() as executor:
-                all_results = list(executor.map(process_single_doc, documents))
+            all_results = []
+            for doc in documents:
+                all_results.append(process_single_doc(doc))
+            # with ThreadPoolExecutor() as executor:
+            #     all_results = list(executor.map(process_single_doc, documents))
                 
         else:
             def process_batch(batch):

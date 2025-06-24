@@ -23,9 +23,9 @@ collection_name: "ainops24"
 # 粗排参数
 re_only: false  # 只检索，用于调试检索
 retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
-f_topk: 8 # 仅用于混合检索器最终的fusion数量
-f_topk_1: 8
-f_topk_2: 2
+f_topk: 32 # 仅用于混合检索器最终的fusion数量
+f_topk_1: 32
+f_topk_2: 8
 f_topk_3: 6
 
 # 重排器参数

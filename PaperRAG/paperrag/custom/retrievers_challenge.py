@@ -241,17 +241,17 @@ class VectorRetriever:
 
 
 class HybridRetriever:
-    def __init__(self, vector_db_dir: Path, documents_dir: Path):
-        self.vector_retriever = VectorRetriever(vector_db_dir, documents_dir)
-        self.reranker = LLMReranker()
+    def __init__(self, embedding_model, vector_db_dir: Path, documents_dir: Path, llm):
+        self.vector_retriever = VectorRetriever(embedding_model=embedding_model, vector_db_dir=vector_db_dir, documents_dir=documents_dir)
+        self.reranker = LLMReranker(llm=llm)
         
     def retrieve_by_company_name(
         self, 
         company_name: str, 
         query: str, 
-        llm_reranking_sample_size: int = 28,
+        llm_reranking_sample_size: int = 8,
         documents_batch_size: int = 2,
-        top_n: int = 6,
+        top_n: int = 4,
         llm_weight: float = 0.7,
         return_parent_pages: bool = False
     ) -> List[Dict]:
@@ -279,6 +279,7 @@ class HybridRetriever:
         )
         
         # Rerank results using LLM
+        documents_batch_size = 1
         reranked_results = self.reranker.rerank_documents(
             query=query,
             documents=vector_results,
