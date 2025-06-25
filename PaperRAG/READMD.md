@@ -31,8 +31,8 @@ bge-base-en-v1.5 hierarchical 密集检索 top8 0.4089 (qwen-plus-latest)
 bge-base-en-v1.5 hierarchical 密集检索 top8 0.3644 en-template (qwen-plus-latest)
 
 待尝试：
-bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25) 保持配置一样，检查一下；
-bge-large-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25) 保持配置一样，检查一下；
+bge-base-en-v1.5 bm25检索 top8 0.4044 (qwen-plus-2025-01-25)
+bge-base-en-v1.5 bm25检索 top8 0.4089 (qwen-plus-2025-01-25) 重新embedding
 
 chunk 300 overlap 50
 bge-base-en-v1.5 密集检索 top8 0.3778 (qwen-plus-latest)

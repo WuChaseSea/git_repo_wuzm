@@ -54,10 +54,6 @@ class PaperRAGPipeline():
             "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key": os.getenv("DASHSCOPE_API_KEY"),
         })
-        # self.llm = OpenAI(
-        #     base_url="https://api.ppinfra.com/v3/openai",
-        #     api_key=os.getenv("PPIO_API_KEY")
-        # )
 
         self.qa_template = self.build_prompt_template(QA_TEMPLATE)
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
@@ -77,13 +73,14 @@ class PaperRAGPipeline():
         data_path = os.path.join(self.work_dir, config["data_path"])
         chunk_size = config["chunk_size"]
         chunk_overlap = config["chunk_overlap"]
-        if not Path("documents.pkl").exists():
-            data = read_data(data_path)
-            with open("documents.pkl", "wb") as f:
-                pickle.dump(data, f)
-        else:
-            with open("documents.pkl", "rb") as f:
-                data = pickle.load(f)
+        data = read_data(data_path)
+        # if not Path("documents.pkl").exists():
+        #     data = read_data(data_path)
+        #     with open("documents.pkl", "wb") as f:
+        #         pickle.dump(data, f)
+        # else:
+        #     with open("documents.pkl", "rb") as f:
+        #         data = pickle.load(f)
         print(f"文档读入完成，一共有 {len(data)} 个文档.")
 
         vector_store = None
@@ -103,6 +100,7 @@ class PaperRAGPipeline():
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap,
         )
+        
         if collection_info.points_count == 0:
             # 暂时停止实时索引
             client.update_collection(
