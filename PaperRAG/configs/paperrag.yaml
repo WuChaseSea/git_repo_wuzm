@@ -17,7 +17,7 @@ qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-base-en-v1.5"
 vector_size: 768
-cache_path: "cache_bge_base_en_sen_512_langchain_reader"
+cache_path: "cache_bge_base_en_new_top_512"
 collection_name: "ainops24"
 
 # 粗排参数

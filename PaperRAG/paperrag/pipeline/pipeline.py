@@ -53,6 +53,9 @@ class PaperRAGPipeline():
             "model": config["llm_name"],
             "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
             "api_key": os.getenv("DASHSCOPE_API_KEY"),
+            'generate_cfg': {
+                'temperature': 0.0
+            }
         })
 
         self.qa_template = self.build_prompt_template(QA_TEMPLATE)
@@ -303,7 +306,6 @@ class PaperRAGPipeline():
         
         # node_with_scores = self.dense_retriever.retrieve(query_bundle)
         node_with_scores = await self.retriever.aretrieve(query_bundle)
-        
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:

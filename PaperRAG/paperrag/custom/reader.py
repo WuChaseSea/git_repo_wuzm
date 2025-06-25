@@ -227,7 +227,7 @@ logger = logging.getLogger(__name__)
 
 RETRY_TIMES = 3
 
-''''''
+
 class PDFReader(BaseReader):
     """PDF parser."""
 
@@ -324,7 +324,6 @@ class PDFReader(BaseReader):
         
         
         fs = fs or get_default_fs()
-        
         with fs.open(str(file), "rb") as fp:
             # Load the file in memory if the filesystem is not the default one to avoid
             # issues with pypdf
@@ -354,6 +353,7 @@ class PDFReader(BaseReader):
             # This block returns each page of a PDF as its own Document
             else:
                 # Iterate over every page
+
                 for page in range(num_pages):
                     # Extract the text from the page
                     page_text = pdf.pages[page].extract_text()
