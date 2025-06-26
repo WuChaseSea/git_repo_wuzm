@@ -1,0 +1,49 @@
+work_dir: "/Volumes/Dataset/TIANCHIPaperRAG"  # 项目目录
+
+# 大语言模型参数
+llm_name: "qwen-plus-2025-01-25"
+llm_embed_type: 3 # 最终的上下文文档编码参数
+
+# 数据参数
+data_path: "papar_QA_dataset/papers"  # 数据在项目目录中的路径
+
+# 分块策略
+split_type: 0 # 0-->Sentence 1-->Hierarchical
+chunk_size: 512
+chunk_overlap: 128
+
+# 密集检索器参数
+qdrant_url: "http://localhost:6333"
+reindex: false
+embedding_name: "/Users/Documents/Models/embedding_models/bge-base-en-v1.5"  # bge-base-en-v1.5路径位置
+vector_size: 768
+cache_path: "cache_bge_base_en_new_top_512"  # 保存的数据库名称，不用改
+collection_name: "ainops24"
+
+# 粗排参数
+re_only: false  # 只检索，用于调试检索
+retrieval_type: 2 # 1-->密集 2-->稀疏 3-->混合
+f_topk: 32 # 仅用于混合检索器最终的fusion数量
+f_topk_1: 32
+f_topk_2: 8
+f_topk_3: 6
+
+# 重排器参数
+r_topk: 8 # 精排topk
+r_topk_1: 6 # 精排后Fusion的topk
+reranker_name: "/Users/Documents/Models/reranker/bge-reranker-v2-m3"  # bge-reranker-v2-m3路径位置
+use_reranker: 0 # 0-->不使用 1-->ST的普通Reranker 2-->bge LLM Reranker
+r_embed_bs: 32
+r_use_efficient: 0 # 0-->不加速 1-->使用最大值选择方法加速 2-->使用熵选择方法加速
+
+# 文本排序编码方式
+f_embed_type_1: 1 # 密集检索的文档编码方式
+f_embed_type_2: 2 # 稀疏检索的文档编码方式
+r_embed_type: 1 # 重排的文档编码方式
+
+# 稀疏检索器参数
+bm25_type: 0 # 0-->官方实现 1-->bm25s实现，速度更快
+
+# 流程参数
+rerank_fusion_type: 0 # 0-->不使用精排后fusion 1-->两路检索结果rrf 2-->生成长度最大的作为最终结果 3-->两路生成结果拼接
+ans_refine_type: 0 # 0-->不对答案做后处理 1-->LLM利用top1文档和参考答案生成新答案 2-->LLM将top1文档和参考答案拼接生成新答案

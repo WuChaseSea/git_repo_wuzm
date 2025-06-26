@@ -67,3 +67,6 @@ bge-base-en-v1.5 hierarchical 密集检索 top8 0.3378 (qwen-plus-latest)
 VL实验
 colpali-v1.2 top8 qwen-vl-plus 0.3156
 colpali-v1.2 top8 qwen-vl-max-latest 0.3733
+
+debug思路：
+
