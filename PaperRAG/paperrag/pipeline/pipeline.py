@@ -148,12 +148,12 @@ class PaperRAGPipeline():
         )
         print("创建BM25稀疏检索器成功")
         # 创建检索器
-        retrieval_type = config["retrieval_type"]
-        if retrieval_type == 1:
+        self.retrieval_type = config["retrieval_type"]
+        if self.retrieval_type == 1:
             self.retriever = self.dense_retriever
-        elif retrieval_type == 2:
+        elif self.retrieval_type == 2:
             self.retriever = self.sparse_retriever
-        elif retrieval_type == 3:
+        elif self.retrieval_type == 3:
             f_topk = config['f_topk']
             self.retriever = HybridRetriever(
                 dense_retriever=self.dense_retriever,
@@ -293,9 +293,6 @@ class PaperRAGPipeline():
             ret.text = ret.text + "\n\n" + contents[0]
         return {"answer": ret, "nodes": node_with_scores, "contexts": contents}
 
-
-        
-
     async def generation_with_knowledge_retrieval(
             self,
             query_str: str,
@@ -303,9 +300,11 @@ class PaperRAGPipeline():
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
-        
-        # node_with_scores = self.dense_retriever.retrieve(query_bundle)
-        node_with_scores = await self.retriever.aretrieve(query_bundle)
+        if self.retrieval_type == 1:
+            node_with_scores = self.dense_retriever.retrieve(query_bundle)
+        elif self.retrieval_type == 2:
+            node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
+        # node_with_scores = await self.retriever.aretrieve(query_bundle)
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
@@ -315,6 +314,7 @@ class PaperRAGPipeline():
             node_with_scores,
             node_with_scores_path,
         ])
+        
         if self.reranker:
             node_with_scores = self.reranker.postprocess_nodes(node_with_scores, query_bundle)
 
@@ -328,6 +328,7 @@ class PaperRAGPipeline():
             context_str=context_str, query_str=query_str
         )
         ret = await self.generation(self.llm, fmt_qa_prompt)
+        # ret = None
         if self.ans_refine_type == 1:
             fmt_merge_prompt = self.merge_template.format(
                 context_str=contents[0], query_str=query_str, answer_str=ret.text
@@ -336,3 +337,4 @@ class PaperRAGPipeline():
         elif self.ans_refine_type == 2:
             ret.text = ret.text + "\n\n" + contents[0]
         return {"answer": ret, "nodes": node_with_scores, "contexts": contents}
+    

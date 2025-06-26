@@ -32,8 +32,6 @@ from llama_index.core.readers.base import BaseReader, ResourcesReaderMixin
 from llama_index.core.schema import Document
 from llama_index.core.utils import get_tqdm_iterable
 
-from langchain_community.document_loaders import UnstructuredPDFLoader
-
 
 logger = logging.getLogger(__name__)
 
@@ -236,9 +234,6 @@ class PDFReader(BaseReader):
         Initialize PDFReader.
         """
         self.return_full_document = return_full_document
-        import logging
-        logging.getLogger("pdfminer").setLevel(logging.ERROR)
-
 
     def safe_text(self, text):
         try:
@@ -246,16 +241,6 @@ class PDFReader(BaseReader):
         except Exception:
             # fallback，清除所有非法字符
             return re.sub(r'[\ud800-\udfff]', '', text)
-    
-    def clean_text(self, text: str) -> str:
-        # 合并行内换行，保留段落间空行
-        text = re.sub(r'(?<!\n)\n(?!\n)', ' ', text)
-        text = re.sub(r'\n{3,}', '\n\n', text)  # 避免连续太多换行
-        # 去除页码等信息
-        text = re.sub(r'Page \d+|^Copyright.*?\n', '', text, flags=re.IGNORECASE)
-        # 压缩多余空格
-        text = re.sub(r'[ \t]+', ' ', text)
-        return text.strip()
 
     # @retry(
     #     stop=stop_after_attempt(RETRY_TIMES),
@@ -272,57 +257,10 @@ class PDFReader(BaseReader):
 
         try:
             import pypdf
-            import pdfplumber, re
-            import fitz
         except ImportError:
             raise ImportError(
                 "pypdf is required to read PDF files: `pip install pypdf`"
             )
-        
-        # print(f"正在加载 {str(file)}")
-        # # 加载结构化元素
-        # loader = UnstructuredPDFLoader(
-        #     str(file),
-        #     mode="elements"
-        # )
-        # elements = loader.load()
-
-        # # 过滤函数：排除页码/页眉/页脚等疑似内容
-        # def is_valid_content(element):
-        #     text = element.page_content.strip()
-            
-        #     # 去除很短的行（比如单独的页码、标题序号等）
-        #     if len(text) < 10:
-        #         return False
-
-        #     # 去除全数字（可能是页码）
-        #     if text.isdigit():
-        #         return False
-
-        #     # 去除常见页码格式，比如 "Page 1", "1 of 10"
-        #     import re
-        #     if re.match(r"^page\s*\d+.*$", text.lower()):
-        #         return False
-        #     if re.match(r"^\d+\s*/\s*\d+$", text):
-        #         return False
-
-        #     # 根据类别保留正文
-        #     category = element.metadata.get("category", "")
-        #     if category in ["NarrativeText", "Title", "ListItem", "BulletedText"]:
-        #         return True
-            
-        #     return False
-
-        # # 应用过滤
-        # filtered_docs = [el for el in elements if is_valid_content(el)]
-        # # 输出正文
-        # docs = []
-        # for doc in filtered_docs:
-        #     metadata = doc.metadata
-        #     docs.append(Document(text=doc.page_content, metadata=metadata))
-        # return docs
-        
-        
         fs = fs or get_default_fs()
         with fs.open(str(file), "rb") as fp:
             # Load the file in memory if the filesystem is not the default one to avoid
@@ -366,52 +304,6 @@ class PDFReader(BaseReader):
                     docs.append(Document(text=self.safe_text(page_text), metadata=metadata))
 
             return docs
-        '''
-        docs = []
-        with pdfplumber.open(file) as pdf:
-            metadata = {"file_name": file.name}
-            if extra_info:
-                metadata.update(extra_info)
-
-            if self.return_full_document:
-                full_text = "\n".join(
-                    self.clean_text(self.safe_text(page.extract_text() or ""))
-                    for page in pdf.pages
-                )
-                docs.append(Document(text=full_text, metadata=metadata))
-            else:
-                for i, page in enumerate(pdf.pages):
-                    page_text = page.extract_text() or ""
-                    page_text = self.clean_text(self.safe_text(page_text))
-                    docs.append(Document(
-                        text=page_text,
-                        metadata={**metadata, "page_number": i + 1}
-                    ))
-
-        return docs'''
-        '''
-        docs = []
-        metadata = {"file_name": file.name}
-        if extra_info:
-            metadata.update(extra_info)
-
-        with fitz.open(file) as pdf:
-            if self.return_full_document:
-                full_text = "\n".join(
-                    self.clean_text(self.safe_text(page.get_text("text") or ""))
-                    for page in pdf
-                )
-                docs.append(Document(text=full_text, metadata=metadata))
-            else:
-                for i, page in enumerate(pdf):
-                    page_text = page.get_text("text") or ""
-                    page_text = self.clean_text(self.safe_text(page_text))
-                    docs.append(Document(
-                        text=page_text,
-                        metadata={**metadata, "page_number": i + 1}
-                    ))
-
-        return docs'''
 
 
 class SimpleDirectoryReader(BaseReader, ResourcesReaderMixin, FileSystemReaderMixin):

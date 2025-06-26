@@ -19,6 +19,7 @@ chunk 512 overlap 128
 **bge-base-en-v1.5 bm25检索 top8 0.4356 (qwen-plus-2025-01-25)**
 bge-base-en-v1.5 bm25检索 top16 0.4222 (qwen-plus-latest)
 bge-base-en-v1.5 密集检索 top32 0.3733 (qwen-plus-latest)
+bge-base-en-v1.5 密集检索 top32 0.3644  (qwen-max-2025-01-25) ？？？
 bge-base-en-v1.5 bm25检索 top8 0.3733 (qwen-plus-latest)  这个地方很奇怪，为什么一样的配置效果变差了，难道是LLM的问题
 bge-base-en-v1.5 bm25检索 top16 bge-reranker-v2-m3 rerank top8 0.4267 (qwen-plus-latest)
 bge-base-en-v1.5 bm25检索 从query、A、B、C、D四个选项中分别进行召回top8，然后进行合并，rerank top8 0.3778 (qwen-plus-latest)
@@ -69,4 +70,16 @@ colpali-v1.2 top8 qwen-vl-plus 0.3156
 colpali-v1.2 top8 qwen-vl-max-latest 0.3733
 
 debug思路：
+添加保存node节点到csv中，以便查看node是否✅；
+使用之前的embedding和重新embedding之后看看查找的是否对；
 
+试了：
+chunk500 overlap 128
+密集top32 top32 0.3644
+密集 top8 用之前的embedding 0.3778
+
+chunk300 overlap 50
+密集 top32 0.3733
+bm25 top8 0.3689
+
+尝试：已经将reader退回之前的代码了，明天再跑一遍重新生成512的embedding，bm25检索；
