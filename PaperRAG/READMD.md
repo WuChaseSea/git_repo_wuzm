@@ -82,4 +82,7 @@ chunk300 overlap 50
 密集 top32 0.3733
 bm25 top8 0.3689
 
-尝试：已经将reader退回之前的代码了，明天再跑一遍重新生成512的embedding，bm25检索；
+尝试：
+再检查一遍对应参数是否正确传递：
+1）已经将reader退回之前的代码了，明天再跑一遍重新生成512的embedding，bm25检索 top8；
+2）如果不是reader的问题的话，我用之前保存到回退的代码，重新生成embedding，bm25检索 top8；
