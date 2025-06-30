@@ -110,6 +110,7 @@ def _try_loading_included_file_formats() -> dict[
         ".ipynb": IPYNBReader,
         ".xls": PandasExcelReader,
         ".xlsx": PandasExcelReader,
+        ".json": JSONReader
     }
     return default_file_reader_cls
 
@@ -304,6 +305,47 @@ class PDFReader(BaseReader):
                     docs.append(Document(text=self.safe_text(page_text), metadata=metadata))
 
             return docs
+
+
+class JSONReader(BaseReader):
+    """PDF parser."""
+
+    def __init__(self, return_full_document: Optional[bool] = False) -> None:
+        """
+        Initialize PDFReader.
+        """
+        self.return_full_document = return_full_document
+
+    def safe_text(self, text):
+        try:
+            return text.encode('utf-16', 'surrogatepass').decode('utf-16')
+        except Exception:
+            # fallback，清除所有非法字符
+            return re.sub(r'[\ud800-\udfff]', '', text)
+
+    # @retry(
+    #     stop=stop_after_attempt(RETRY_TIMES),
+    # )
+    def load_data(
+        self,
+        file: Path,
+        extra_info: Optional[Dict] = None,
+        fs: Optional[AbstractFileSystem] = None,
+    ) -> List[Document]:
+        """Parse file."""
+        if not isinstance(file, Path):
+            file = Path(file)
+        
+        import json
+        with open(str(file), 'r', encoding='utf-8') as file:
+            report_data = json.load(file)
+        text_chunks = [chunk['text'] for chunk in report_data['content']['chunks']]
+        text_pages = [chunk['page'] for chunk in report_data['content']['chunks']]
+        docs = []
+        for text_chunk, text_page in zip(text_chunks, text_pages):
+            metadata = {"page_label": text_page, "file_name": file.name}
+            docs.append(Document(text=self.safe_text(text_chunk), metadata=metadata))
+        return docs
 
 
 class SimpleDirectoryReader(BaseReader, ResourcesReaderMixin, FileSystemReaderMixin):
@@ -823,7 +865,7 @@ class SimpleDirectoryReader(BaseReader, ResourcesReaderMixin, FileSystemReaderMi
 
         files_to_process = self.input_files
         fs = fs or self.fs
-
+        
         if num_workers and num_workers > 1:
             num_cpus = multiprocessing.cpu_count()
             if num_workers > num_cpus:

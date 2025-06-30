@@ -9,6 +9,84 @@ QA_TEMPLATE = """\
     回答：\
     """
 
+QA_TEMPLATE_0 = """\
+你是一名学术助手。以下是从论文中提取的上下文内容：
+
+--------------------
+{context_str}
+--------------------
+
+请你仅根据上述内容判断以下每个选项是否被论文所支持。使用 JSON 格式返回结果，例如：{"A": true, "B": false, "C": false, "D": true}。
+
+{query_str}
+"""
+
+QA_TEMPLATE_1 = """\
+你是一名学术助手。以下是论文中与问题相关的内容：
+
+--------------------
+{context_str}
+--------------------
+
+请你基于上下文信息分析问题，判断哪些选项正确描述了模型的处理过程或机制。请使用 JSON 格式返回，例如：{"A": true, "B": false, "C": true, "D": false}。
+
+{query_str}
+
+"""
+
+QA_TEMPLATE_2 = """\
+你是一名学术助手。下面是从论文中提取的上下文内容：
+
+--------------------
+{context_str}
+--------------------
+
+请你根据上下文判断以下哪些选项正确地描述了问题中提到的术语或概念。请使用 JSON 格式返回，例如：{"A": true, "B": false, "C": true, "D": false}。
+
+{query_str}
+
+"""
+
+QA_TEMPLATE_3 = """\
+你是一名学术助手。请根据以下上下文内容回答多选题，仅基于上下文信息作答，不要使用外部知识。请使用 JSON 格式返回每个选项是否正确，例如：{"A": true, "B": false, "C": true, "D": false}。
+
+--------------------
+{context_str}
+--------------------
+
+{query_str}
+
+
+"""
+
+QA_TEMPLATE_4 = """\
+你是一名学术助手。以下是论文中包含对比的信息片段：
+
+--------------------
+{context_str}
+--------------------
+
+请你根据上下文内容，判断以下选项中哪些是论文中比较结果的正确描述。使用 JSON 格式返回，例如：{"A": true, "B": false, "C": true, "D": false}。
+
+{query_str}
+
+"""
+
+QA_TEMPLATE_5 = """\
+你是一名学术助手。以下是论文中与应用场景相关的内容：
+
+--------------------
+{context_str}
+--------------------
+
+请判断以下选项中哪些描述了论文中技术或方法的应用场景或作用。请使用 JSON 格式返回结果，例如：{"A": true, "B": false, "C": true, "D": false}。
+
+{query_str}
+
+
+"""
+
+
 QA_TEMPLATE_EN = """\
 Please answer the following question based **only on the provided context**, not on your own knowledge.
 

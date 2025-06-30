@@ -1,12 +1,12 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
-result_dir: "result_回退的embedding和新代码"
+result_dir: "result_bge_base_debug"
 
 # 大语言模型参数
 llm_name: "qwen-plus-2025-01-25"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
-data_path: "papar_QA_dataset/papers"
+data_path: "papar_QA_dataset/chunked_reports"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical
@@ -17,8 +17,8 @@ chunk_overlap: 128
 qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-base-en-v1.5"
-vector_size: 768
-cache_path: "cache_bge_base_en_512_0614_new"
+vector_size: 1024
+cache_path: "cache_bge_base_en_512_debug"
 collection_name: "ainops24"
 
 # 粗排参数

@@ -56,7 +56,7 @@ async def main(
         config
     )
 
-    question_file = str(Path(config["work_dir"]) / "papar_QA_dataset/multi_choice_questions.json")
+    question_file = str(Path(config["work_dir"]) / "papar_QA_dataset/multi_choice_questions_class.json")
     with open(question_file, encoding="utf-8") as f:
         queries = json.loads(f.read())
     print(f"开始生成答案...")
@@ -72,13 +72,13 @@ async def main(
     nodes_list, scores_list, answer_list = [], [], []
     all_rows = []
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        # if num < 173:
+        # if num < 181:
         #     save_one_json = save_folder / f"{num}.json"
         #     with open(save_one_json, encoding="utf-8") as f:
         #         answer = json.loads(f.read())
         #     results[num]["correct_answer"] = answer['correct_answer']
         #     continue
-
+        # import ipdb;ipdb.set_trace()
         res = await rag_pipeline.run(query)
         # res = await rag_pipeline.process_quesiton(query)
         answer = res["answer"]

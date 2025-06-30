@@ -25,7 +25,7 @@ from llama_index.core.embeddings import BaseEmbedding
 from llama_index.core.llms.llm import LLM
 from llama_index.core.ingestion import IngestionPipeline
 from llama_index.core.vector_stores.types import BasePydanticVectorStore
-from llama_index.core.node_parser import SentenceSplitter
+# from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.schema import Document, TransformComponent, NodeWithScore, TextNode, NodeRelationship
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from qdrant_client import QdrantClient, models
@@ -33,6 +33,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 from qdrant_client.http.models import Filter, FieldCondition, MatchValue
 
+from ..custom.splitter import SentenceSplitter
 from ..custom.reader import SimpleDirectoryReader
 from ..custom.hierarchical import HierarchicalNodeParser
 
@@ -42,7 +43,7 @@ def read_data(path: str = "data") -> List[Document]:
         input_dir=path,
         recursive=True,
         required_exts=[
-            ".pdf"
+            ".pdf", ".json"
         ],
         encoding="utf-8"
     )

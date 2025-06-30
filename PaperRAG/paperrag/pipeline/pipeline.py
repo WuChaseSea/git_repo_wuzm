@@ -19,7 +19,7 @@ from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.langchain import LangchainEmbedding
 from qdrant_client import models
 
-from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, QA_TEMPLATE_EN
+from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, QA_TEMPLATE_EN, QA_TEMPLATE_0, QA_TEMPLATE_1, QA_TEMPLATE_2, QA_TEMPLATE_3, QA_TEMPLATE_4, QA_TEMPLATE_5
 from ..custom.retrievers import QdrantRetriever, HybridRetriever, BM25Retriever
 from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
@@ -232,7 +232,8 @@ class PaperRAGPipeline():
         self.retriever.filter_dict = self.filter_dict
         res = await self.generation_with_knowledge_retrieval(
             query_str=query["question"],
-            hyde_query=query.get("hyde_query", "")
+            hyde_query=query.get("hyde_query", ""),
+            template_id=query["correct_answer"]
         )
         return res
     
@@ -296,7 +297,8 @@ class PaperRAGPipeline():
     async def generation_with_knowledge_retrieval(
             self,
             query_str: str,
-            hyde_query: str = ""
+            hyde_query: str = "",
+            template_id: int = 3
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
@@ -324,6 +326,20 @@ class PaperRAGPipeline():
         )
         if self.re_only:
             return {"answer": "", "nodes": node_with_scores, "contexts": contents}
+        template_id = int(template_id)
+        # if template_id == 0:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_0)
+        # elif template_id == 1:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_1)
+        # elif template_id == 2:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_2)
+        # elif template_id == 4:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_4)
+        # elif template_id == 5:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_5)
+        # else:
+        #     self.qa_template = self.build_prompt_template(QA_TEMPLATE_3)
+        
         fmt_qa_prompt = self.qa_template.format(
             context_str=context_str, query_str=query_str
         )

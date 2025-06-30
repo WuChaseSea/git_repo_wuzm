@@ -99,4 +99,8 @@ bm25 top8 0.3689
 返回原来的template 0.3556
 将LLM返回之前的使用qwen_agent get_chat_model，而不是官网上的openai的。原来的template 0.4178，算了还是这个LLM稳定一些
 使用回退生成的embedding和新代码，0.4089
+使用回退生成的embedding和新代码，更改prompt问法，0.3867
+使用回退生成的embedding和新代码，返回最初的prompt问法，0.4044
+使用回退的代码，重新生成embedding，最初的prompt问题，0.4044
+使用新的代码，bge-large 0.4089 问题应该在chunk划分不行；
 现在的代码还是有问题，需要逐个替换看看问题出现在哪儿；起码回退前的代码结果稳定在0.4以上；
