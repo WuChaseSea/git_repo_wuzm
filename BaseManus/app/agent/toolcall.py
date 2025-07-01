@@ -71,7 +71,7 @@ class ToolCallAgent(ReActAgent):
                 self.state = AgentState.FINISHED
                 return False
             raise
-
+        
         self.tool_calls = tool_calls = (
             response.tool_calls if response and response.tool_calls else []
         )

@@ -4,6 +4,7 @@ from typing import Dict, List, Optional, Union
 import tiktoken
 from openai import (
     APIError,
+    OpenAI,
     AsyncAzureOpenAI,
     AsyncOpenAI,
     AuthenticationError,
@@ -223,6 +224,7 @@ class LLM:
                 self.client = BedrockClient()
             else:
                 self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+                # self.client = OpenAI(api_key=self.api_key, base_url=self.base_url)
 
             self.token_counter = TokenCounter(self.tokenizer)
     
@@ -673,7 +675,6 @@ class LLM:
             Exception: For unexpected errors
         """
         try:
-            import pdb;pdb.set_trace()
             # Validate tool_choice
             if tool_choice not in TOOL_CHOICE_VALUES:
                 raise ValueError(f"Invalid tool_choice: {tool_choice}")
@@ -733,6 +734,7 @@ class LLM:
             response: ChatCompletion = await self.client.chat.completions.create(
                 **params
             )
+            # self.client.chat.completions.create(model=params["model"], messages=params["messages"])
 
             # Check if response is valid
             if not response.choices or not response.choices[0].message:

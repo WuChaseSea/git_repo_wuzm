@@ -158,7 +158,7 @@ class Manus(ToolCallAgent):
             )
 
         result = await super().think()
-
+        
         # Restore original prompt
         self.next_step_prompt = original_prompt
 
