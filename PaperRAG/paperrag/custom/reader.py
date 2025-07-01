@@ -343,7 +343,7 @@ class JSONReader(BaseReader):
         text_pages = [chunk['page'] for chunk in report_data['content']['chunks']]
         docs = []
         for text_chunk, text_page in zip(text_chunks, text_pages):
-            metadata = {"page_label": text_page, "file_name": file.name}
+            metadata = {"page_label": text_page, "file_name": Path(file.name).name, "file_path": file.name}
             docs.append(Document(text=self.safe_text(text_chunk), metadata=metadata))
         return docs
 

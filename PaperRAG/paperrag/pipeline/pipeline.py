@@ -204,11 +204,14 @@ class PaperRAGPipeline():
         filter_dict = None
         if "paper_id" in query and query["paper_id"] != "":
             dir = query['paper_id']
+            target_dir = Path(self.config["work_dir"]) / "papar_QA_dataset/papers" / dir
+            pdf_filenames = [f.name for f in target_dir.glob("*.pdf")]
+            pdf_filenames = [f for f in pdf_filenames if not f.startswith(".")][0]
             filters = build_qdrant_filters(
                 dir=dir
             )
             filter_dict = {
-                "file_path": dir
+                "file_path": Path(pdf_filenames).stem
             }
         return filters, filter_dict
     
@@ -311,7 +314,6 @@ class PaperRAGPipeline():
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
             node_with_scores_path = []
-        
         node_with_scores = HybridRetriever.fusion([
             node_with_scores,
             node_with_scores_path,

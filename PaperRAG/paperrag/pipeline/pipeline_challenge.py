@@ -5,7 +5,7 @@
 * created 2025/06/22 22:25:20
 * @function: RAG-Challenge-2 Pipeline https://github.com/IlyaRice/RAG-Challenge-2/blob/main/src/pipeline.py#L153
 '''
-import os
+import os, sys
 from pathlib import Path
 import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
@@ -57,7 +57,7 @@ class PaperRAGChallengePipeline():
         # self.merge_reports()
         self.reports_markdown_path = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "03_reports_markdown"
         # self.export_reports_to_markdown()
-        self.documents_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "chunked_reports"
+        self.documents_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "chunked_reports_300"
         # self.chunk_reports()
         self.vector_db_dir = Path(self.config["work_dir"]) / Path(self.config["data_path"]).parent / "vector_dbs"
         # self.create_vector_dbs(embedding_model=self.embedding)

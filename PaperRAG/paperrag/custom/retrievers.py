@@ -198,7 +198,7 @@ class BM25Retriever(BaseRetriever):
             flag = True
             if self.filter_dict is not None:
                 for key, value in self.filter_dict.items():
-                    if Path(self._nodes[ix].metadata[key]).parent.name != value:
+                    if Path(self._nodes[ix].metadata[key]).stem != value:
                         flag = False
                         break
             if flag:

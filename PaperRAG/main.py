@@ -83,7 +83,7 @@ async def main(
         # res = await rag_pipeline.process_quesiton(query)
         answer = res["answer"]
         
-        answer = change_result(answer)
+        # answer = change_result(answer)
         if answer is None:
             print(f"id {num}: 输出结果不对".center(60, "*"))
             answer = ""

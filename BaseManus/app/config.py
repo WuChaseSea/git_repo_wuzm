@@ -1,4 +1,4 @@
-import json
+import os, json
 import threading
 try:
     import tomllib
@@ -221,7 +221,7 @@ class Config:
         default_settings = {
             "model": base_llm.get("model"),
             "base_url": base_llm.get("base_url"),
-            "api_key": base_llm.get("api_key"),
+            "api_key": os.getenv("DASHSCOPE_API_KEY"),
             "max_tokens": base_llm.get("max_tokens", 4096),
             "max_input_tokens": base_llm.get("max_input_tokens"),
             "temperature": base_llm.get("temperature", 1.0),

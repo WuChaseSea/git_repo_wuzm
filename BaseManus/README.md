@@ -33,3 +33,10 @@ OpenManus/
 ├── run_flow.py           # 流程运行脚本
 ├── setup.py              # 项目安装配置
 └── requirements.txt      # 项目依赖列表
+
+## 环境准备
+
+```sh
+conda create -n manus python=3.12
+pip install -r requirements.txt
+```

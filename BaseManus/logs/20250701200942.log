@@ -1,0 +1,6 @@
+2025-07-01 20:14:00.735 | WARNING  | __main__:main:25 - Processing your request...
+2025-07-01 20:14:00.738 | INFO     | app.agent.base:run:140 - Executing step 1/20
+2025-07-01 20:20:12.201 | ERROR    | app.llm:ask_tool:766 - Unexpected error in ask_tool: 
+2025-07-01 20:20:15.520 | ERROR    | app.llm:ask_tool:766 - Unexpected error in ask_tool: 
+2025-07-01 20:20:17.621 | ERROR    | app.llm:ask_tool:766 - Unexpected error in ask_tool: 
+2025-07-01 20:20:21.508 | ERROR    | app.llm:ask_tool:766 - Unexpected error in ask_tool: 
