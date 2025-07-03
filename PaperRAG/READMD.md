@@ -110,3 +110,12 @@ bm25 top8 0.3689
 更改chunk大小，之前的应该是1024，现在的是512 0.4000
 更改新的prompt，直接回答答案 0.3956
 更改chunk为300 overlap 50，使用新的prompt 0.4133
+将SentenceSplitter中的chunk也更改为300 50的配置，0.3822
+vector 检索 top8，500 128的配置，0.3778
+vector 检索 top32，500 128的配置，0.3911
+
+bge-m3 embedding 0.4133
+将官网上的第一道题答案改成ABC，0.4178
+将template prompt中的问题示例答案改成ABC 0.4267 该基础上将密集索引改成top32，模型使用qwen-max 0.3467
+更改新版的更丰富的prompt，0.3956
+chunk256 overlap50，模型使用qwen-max，top8密集索引 result_bge_m3_vec_top8_256 还没提交

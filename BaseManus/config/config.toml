@@ -1,6 +1,6 @@
 # Global LLM configuration
 [llm]
-model = "qwen-turbo"       # The LLM model to use
+model = "qwen-plus"       # The LLM model to use
 base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1" # API endpoint URL
 api_key = "YOUR_API_KEY"                   # Your API key
 max_tokens = 4096                          # Maximum number of tokens in the response
@@ -70,9 +70,9 @@ temperature = 0.0                          # Controls randomness for vision mode
 # password = "proxy-password"
 
 # Optional configuration, Search settings.
-# [search]
+[search]
 # Search engine for agent to use. Default is "Google", can be set to "Baidu" or "DuckDuckGo" or "Bing".
-#engine = "Google"
+engine = "Bing"
 # Fallback engine order. Default is ["DuckDuckGo", "Baidu", "Bing"] - will try in this order after primary engine fails.
 #fallback_engines = ["DuckDuckGo", "Baidu", "Bing"]
 # Seconds to wait before retrying all engines again when they all fail due to rate limits. Default is 60.
@@ -80,9 +80,9 @@ temperature = 0.0                          # Controls randomness for vision mode
 # Maximum number of times to retry all engines when all fail. Default is 3.
 #max_retries = 3
 # Language code for search results. Options: "en" (English), "zh" (Chinese), etc.
-#lang = "en"
+lang = "zh"
 # Country code for search results. Options: "us" (United States), "cn" (China), etc.
-#country = "us"
+country = "cn"
 
 
 ## Sandbox configuration

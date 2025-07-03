@@ -41,7 +41,7 @@ class ToolCallAgent(ReActAgent):
         if self.next_step_prompt:
             user_msg = Message.user_message(self.next_step_prompt)
             self.messages += [user_msg]
-
+        
         try:
             # Get response with tool options
             response = await self.llm.ask_tool(

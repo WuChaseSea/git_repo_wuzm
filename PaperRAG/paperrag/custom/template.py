@@ -19,7 +19,7 @@ QA_TEMPLATE = """\
 接下来是1个例子：
 题干：
 Which of the following factors may cause multilingual large language models to show English bias when processing non-English languages?\nA. The model's training data mainly consists of English text.\nB. The model uses English as the central language in the middle layer for semantic understanding and reasoning.\nC. In the model's word embedding space, English word embeddings are more densely distributed and easier to be \"captured\" by the model.\nD. The model translates non-English text into English before translating it into the target language.
-答案：ABCD
+答案：ABC
 
 接下来是你要回答的大语言模型知识题：
 
@@ -31,6 +31,38 @@ Which of the following factors may cause multilingual large language models to s
 
 回答：\
 """
+
+QA_TEMPLATE_old1 = """\
+你是一位大语言模型领域的专家，拥有丰富的科研经验，也发表过大量的SCI论文。你的任务是根据提供的论文内容回答一道多选题。
+
+请注意：你必须 **严格基于提供的上下文信息** 回答问题，不得使用已有的知识背景或常识。正确选项可能为一个或多个，如 A、AB、ACD 等。
+
+你需要在心中逐项判断每个选项是否被论文内容支持，但**最终只输出选项组合**，不要输出推理过程，不要添加任何额外说明。
+
+以下是一个示例：
+
+---
+题干：
+Which of the following factors may cause multilingual large language models to show English bias when processing non-English languages?
+A. The model's training data mainly consists of English text.
+B. The model uses English as the central language in the middle layer for semantic understanding and reasoning.
+C. In the model's word embedding space, English word embeddings are more densely distributed and easier to be "captured" by the model.
+D. The model translates non-English text into English before translating it into the target language.
+
+回答：ABC
+---
+
+现在请回答下面这道题：
+
+提供的上下文信息：
+{context_str}
+
+题干：
+{query_str}
+
+回答：\
+"""
+
 
 
 QA_TEMPLATE_0 = """\

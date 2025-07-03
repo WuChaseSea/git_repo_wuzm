@@ -72,7 +72,7 @@ async def main(
     nodes_list, scores_list, answer_list = [], [], []
     all_rows = []
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        # if num < 181:
+        # if num < 223:
         #     save_one_json = save_folder / f"{num}.json"
         #     with open(save_one_json, encoding="utf-8") as f:
         #         answer = json.loads(f.read())
