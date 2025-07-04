@@ -1,8 +1,8 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
-result_dir: "result_bge_m3_vec_top8_256"
+result_dir: "result_bge_m3_vec_top8_multi"
 
 # 大语言模型参数
-llm_name: "qwen-max"
+llm_name: "qwen-plus-2025-01-25"
 llm_embed_type: 3 # 最终的上下文文档编码参数
 
 # 数据参数
@@ -10,7 +10,7 @@ data_path: "papar_QA_dataset/chunked_reports_300"
 
 # 分块策略
 split_type: 0 # 0-->Sentence 1-->Hierarchical
-chunk_size: 256
+chunk_size: 300
 chunk_overlap: 50
 
 # 密集检索器参数
@@ -18,7 +18,7 @@ qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
 vector_size: 1024
-cache_path: "cache_bge_m3_256_doclingpdf"
+cache_path: "cache_bge_m3_300_doclingpdf"
 collection_name: "ainops24"
 
 # 粗排参数

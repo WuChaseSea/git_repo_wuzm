@@ -118,4 +118,8 @@ bge-m3 embedding 0.4133
 将官网上的第一道题答案改成ABC，0.4178
 将template prompt中的问题示例答案改成ABC 0.4267 该基础上将密集索引改成top32，模型使用qwen-max 0.3467
 更改新版的更丰富的prompt，0.3956
-chunk256 overlap50，模型使用qwen-max，top8密集索引 result_bge_m3_vec_top8_256 还没提交
+chunk256 overlap50，模型使用qwen-max，top8密集索引 result_bge_m3_vec_top8_256 0.3378
+chunk300 overlap50，模型使用qwen-max top8密集索引 0.3467 qwen-plus-2025-01-25
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4356 result_bge_m3_vec_top8_300_1
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4178 result_bge_m3_vec_top8_step 在template中添加了step by step之类的；
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4667 result_bge_m3_vec_top8_multi 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
