@@ -3,12 +3,12 @@ from pathlib import Path
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma
-from langchain_cohere import CohereEmbeddings
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 
 # Set embeddings
 # embd = CohereEmbeddings()
-model_name = r"E:\Models\embedding\bge-m3"
+# model_name = r"E:\Models\embedding\bge-m3"
+model_name = "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
 model_kwargs = {'device': 'cpu'}
 encode_kwargs = {'normalize_embeddings': False}
 embd = HuggingFaceBgeEmbeddings(
@@ -55,7 +55,6 @@ from typing import Literal
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_cohere import ChatCohere
 from langchain_community.chat_models.tongyi import ChatTongyi
 
 # Data model
@@ -87,12 +86,68 @@ route_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-question_router = route_prompt | structured_llm_router
-response = question_router.invoke({"question": "Who will the Bears draft first in the NFL draft?"})
-print(response.tool_calls)
-response = question_router.invoke({"question": "What are the types of agent memory?"})
-print(f"1111")
-print(response.tool_calls)
-response = question_router.invoke({"question": "Hi how are you?"})
-print("******")
-print(response.tool_calls)
+# question_router = route_prompt | structured_llm_router
+# response = question_router.invoke({"question": "Who will the Bears draft first in the NFL draft?"})
+# print(response.tool_calls)
+# response = question_router.invoke({"question": "What are the types of agent memory?"})
+# print(f"1111")
+# print(response.tool_calls)
+# response = question_router.invoke({"question": "Hi how are you?"})
+# print("******")
+# print(response.tool_calls)
+
+### Retrieval Grader
+
+# Data model
+class GradeDocuments(BaseModel):
+    """Binary score for relevance check on retrieved documents."""
+
+    binary_score: str = Field(description="Documents are relevant to the question, 'yes' or 'no'")
+
+# Prompt
+preamble = """You are a grader assessing relevance of a retrieved document to a user question. \n
+If the document contains keyword(s) or semantic meaning related to the user question, grade it as relevant. \n
+Give a binary score 'yes' or 'no' score to indicate whether the document is relevant to the question."""
+
+
+# structured_llm_grader = llm.with_structured_output(GradeDocuments)
+
+# grade_prompt = ChatPromptTemplate.from_messages(
+#     [
+#         ("system", preamble),
+#         ("human", "Retrieved document: \n\n {document} \n\n User question: {question}"),
+#     ]
+# )
+
+# retrieval_grader = grade_prompt | structured_llm_grader
+question = "types of agent memory"
+docs = retriever.invoke(question)
+# doc_txt = docs[1].page_content
+# response =  retrieval_grader.invoke({"question": question, "document": doc_txt})
+# print(response)
+
+### Generate
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import HumanMessage
+
+
+# Preamble
+preamble = """You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise."""
+
+# Prompt
+prompt = lambda x: ChatPromptTemplate.from_messages(
+    [
+        HumanMessage(
+            f"Question: {x['question']} \nAnswer: ",
+            additional_kwargs={"documents": x["documents"]},
+        )
+    ]
+)
+
+# Chain
+rag_chain = prompt | llm | StrOutputParser()
+
+# Run
+generation = rag_chain.invoke({"documents": docs, "question": question})
+print(generation)

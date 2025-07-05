@@ -158,7 +158,7 @@ class PaperRAGPipeline():
             self.retriever = HybridRetriever(
                 dense_retriever=self.dense_retriever,
                 sparse_retriever=self.sparse_retriever,
-                retrieval_type=retrieval_type,  # 1-dense 2-sparse 3-hybrid
+                retrieval_type=self.retrieval_type,  # 1-dense 2-sparse 3-hybrid
                 topk=f_topk,
             )
             print("创建混合检索器成功")
@@ -309,7 +309,8 @@ class PaperRAGPipeline():
             node_with_scores = self.dense_retriever.retrieve(query_bundle)
         elif self.retrieval_type == 2:
             node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
-        # node_with_scores = await self.retriever.aretrieve(query_bundle)
+        else:
+            node_with_scores = await self.retriever.aretrieve(query_bundle)
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:

@@ -123,3 +123,8 @@ chunk300 overlap50，模型使用qwen-max top8密集索引 0.3467 qwen-plus-2025
 chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4356 result_bge_m3_vec_top8_300_1
 chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4178 result_bge_m3_vec_top8_step 在template中添加了step by step之类的；
 chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8密集索引 0.4667 result_bge_m3_vec_top8_multi 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8 bm25索引 0.4311 result_bge_m3_bm25_top8_multi 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8 混合索引 0.4356 result_bge_m3_hybr_top8_multi 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
+chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8 混合索引 rerank 0.4178 result_bge_m3_hybr_top8_rerank 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
+密集索引 top8 更改template中为4项 0.4533
+更改template 0.4400

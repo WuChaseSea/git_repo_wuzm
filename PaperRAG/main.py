@@ -72,13 +72,13 @@ async def main(
     nodes_list, scores_list, answer_list = [], [], []
     all_rows = []
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        # if num < 223:
+        # if num < 84:
         #     save_one_json = save_folder / f"{num}.json"
         #     with open(save_one_json, encoding="utf-8") as f:
         #         answer = json.loads(f.read())
         #     results[num]["correct_answer"] = answer['correct_answer']
         #     continue
-        # import ipdb;ipdb.set_trace()
+        
         res = await rag_pipeline.run(query)
         # res = await rag_pipeline.process_quesiton(query)
         answer = res["answer"]
@@ -89,6 +89,8 @@ async def main(
             answer = ""
         else:
             print(f"id {num}: {answer}")
+        if not isinstance(answer, str):
+            answer = ""
         results[num]["correct_answer"] = answer
         save_one_json = save_folder / f"{num}.json"
         with open(str(save_one_json), "w", encoding="utf-8") as f:
