@@ -1,14 +1,20 @@
 ### Build Index
+from typing import Literal
 from pathlib import Path
+
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.vectorstores import Chroma
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_community.chat_models.tongyi import ChatTongyi
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import HumanMessage
 
-# Set embeddings
-# embd = CohereEmbeddings()
-# model_name = r"E:\Models\embedding\bge-m3"
-model_name = "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
+# 构建embedding模型
+model_name = r"E:\Models\embedding\bge-m3"
+# model_name = "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
 model_kwargs = {'device': 'cpu'}
 encode_kwargs = {'normalize_embeddings': False}
 embd = HuggingFaceBgeEmbeddings(
@@ -17,7 +23,7 @@ embd = HuggingFaceBgeEmbeddings(
     encode_kwargs=encode_kwargs
 )
 
-# Docs to index
+# 构建文献索引
 urls = [
     "https://lilianweng.github.io/posts/2023-06-23-agent/",
     "https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/",
@@ -50,12 +56,6 @@ else:
 
 retriever = vectorstore.as_retriever()
 
-### Router
-from typing import Literal
-
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_community.chat_models.tongyi import ChatTongyi
 
 # Data model
 class web_search(BaseModel):
@@ -64,7 +64,7 @@ class web_search(BaseModel):
     """
     query: str = Field(description="The query to use when searching the internet.")
 
-class vectorstore(BaseModel):
+class vectorstore1(BaseModel):
     """
     A vectorstore containing documents related to agents, prompt engineering, and adversarial attacks. Use the vectorstore for questions on these topics.
     """
@@ -77,7 +77,7 @@ Use the vectorstore for questions on these topics. Otherwise, use web-search."""
 
 # LLM with tool use and preamble
 llm = ChatTongyi(model='qwen-plus', temperature=0.0)
-structured_llm_router = llm.bind_tools(tools=[web_search, vectorstore], preamble=preamble)
+structured_llm_router = llm.bind_tools(tools=[web_search, vectorstore1], preamble=preamble)
 
 # Prompt
 route_prompt = ChatPromptTemplate.from_messages(
@@ -86,15 +86,20 @@ route_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-# question_router = route_prompt | structured_llm_router
+
+question_router = route_prompt | structured_llm_router
+response = question_router.invoke({"question": "Who will the Bears draft first in the NFL draft?"})
+print(response.tool_calls)
+
+response = question_router.invoke({"question": "What are the types of agent memory?"})
 # response = question_router.invoke({"question": "Who will the Bears draft first in the NFL draft?"})
-# print(response.tool_calls)
-# response = question_router.invoke({"question": "What are the types of agent memory?"})
-# print(f"1111")
-# print(response.tool_calls)
-# response = question_router.invoke({"question": "Hi how are you?"})
-# print("******")
-# print(response.tool_calls)
+print(f"1111")
+print(response.tool_calls)
+response = question_router.invoke({"question": "Hi how are you?"})
+print("******")
+print(response.tool_calls)
+import sys
+sys.exit()
 
 ### Retrieval Grader
 
@@ -125,11 +130,6 @@ docs = retriever.invoke(question)
 # doc_txt = docs[1].page_content
 # response =  retrieval_grader.invoke({"question": question, "document": doc_txt})
 # print(response)
-
-### Generate
-
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages import HumanMessage
 
 
 # Preamble
