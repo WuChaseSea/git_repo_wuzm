@@ -1,5 +1,5 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
-result_dir: "result_bge_m3_vector_1"
+result_dir: "result_bge_m3_vector_template_10"
 
 # 大语言模型参数
 llm_name: "qwen-plus-2025-01-25"

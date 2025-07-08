@@ -4,10 +4,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.chat_models.tongyi import ChatTongyi
 
 # 构建embedding模型
-model_name = r"E:\Models\embedding\bge-m3"
-# model_name = "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
+# model_name = r"E:\Models\embedding\bge-m3"
+model_name = "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
 model_kwargs = {'device': 'cpu'}
 encode_kwargs = {'normalize_embeddings': False}
 embd = HuggingFaceBgeEmbeddings(
@@ -48,3 +49,5 @@ else:
     vectorstore = Chroma(persist_directory=persist_directory, embedding_function=embd)
 
 retriever = vectorstore.as_retriever()
+
+llm = ChatTongyi(model='qwen-plus', temperature=0.0)

@@ -128,3 +128,28 @@ chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8 混合索引 0.4356 r
 chunk300 overlap50，模型使用qwen-plus-2025-01-25 top8 混合索引 rerank 0.4178 result_bge_m3_hybr_top8_rerank 可供选择的答案选项总共有5项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
 密集索引 top8 更改template中为4项 0.4533
 更改template 0.4400
+改用问题➕选项召回 0.4222 更改回去 0.4533
+修改prompt为：
+QA_TEMPLATE = """\
+你现在是一位大语言模型领域的专家，拥有丰富的科研经验，也发表过大量的SCI论文。接下来我会给你一道大语言模型相关的论文，请根据题干基于上下文信息而不是自己的知识给出正确答案。
+
+可供选择的答案选项总共有4项，分别是A、B、C、D，正确答案都是多项，如AB或ACD或ABCD，没有单选。
+
+你首先一步一步的推理，然后根据题干给出正确答案，不需要给出推理过程，除了答案不要给出其他任何信息。
+
+接下来是1个例子：
+题干：
+Which of the following factors may cause multilingual large language models to show English bias when processing non-English languages?\nA. The model's training data mainly consists of English text.\nB. The model uses English as the central language in the middle layer for semantic understanding and reasoning.\nC. In the model's word embedding space, English word embeddings are more densely distributed and easier to be \"captured\" by the model.\nD. The model translates non-English text into English before translating it into the target language.
+答案：ABC
+
+接下来是你需要根据查询内容进行回答的问题：
+
+提供的上下文信息：
+{context_str}
+
+题干：
+{query_str}
+
+回答：\
+""" 0.4622
+top6 0.4356 top10 0.4311

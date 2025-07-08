@@ -1,6 +1,7 @@
 from langchain_core.pydantic_v1 import BaseModel, Field
-from langchain_community.chat_models.tongyi import ChatTongyi
 from langchain_core.prompts import ChatPromptTemplate
+
+from prepare import llm
 
 # Data model
 class web_search(BaseModel):
@@ -9,7 +10,7 @@ class web_search(BaseModel):
     """
     query: str = Field(description="The query to use when searching the internet.")
 
-class vectorstore(BaseModel):
+class vectorstore_search(BaseModel):
     """
     A vectorstore containing documents related to agents, prompt engineering, and adversarial attacks. Use the vectorstore for questions on these topics.
     """
@@ -21,8 +22,7 @@ The vectorstore contains documents related to agents, prompt engineering, and ad
 Use the vectorstore for questions on these topics. Otherwise, use web-search."""
 
 # LLM with tool use and preamble
-llm = ChatTongyi(model='qwen-plus', temperature=0.0)
-structured_llm_router = llm.bind_tools(tools=[web_search, vectorstore], preamble=preamble)
+structured_llm_router = llm.bind_tools(tools=[web_search, vectorstore_search], preamble=preamble)
 
 # Prompt
 route_prompt = ChatPromptTemplate.from_messages(

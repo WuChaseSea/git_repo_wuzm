@@ -243,7 +243,8 @@ class PaperRAGPipeline():
     async def generation_with_knowledge_retrieval_four(
             self,
             query_str,
-            hyde_query
+            hyde_query,
+            template_id
     ):
         question_str = query_str.split('A.')[0].strip()
         answer_a = query_str.split('A.')[1].split('B.')[0].strip()
@@ -255,11 +256,11 @@ class PaperRAGPipeline():
         answer_b_bundle = self.build_query_bundle(answer_b)
         answer_c_bundle = self.build_query_bundle(answer_c)
         answer_d_bundle = self.build_query_bundle(answer_d)
-        nodes_query = await self.retriever.aretrieve(query_bundle)
-        nodes_a = await self.retriever.aretrieve(answer_a_bundle)
-        nodes_b = await self.retriever.aretrieve(answer_b_bundle)
-        nodes_c = await self.retriever.aretrieve(answer_c_bundle)
-        nodes_d = await self.retriever.aretrieve(answer_d_bundle)
+        nodes_query = self.dense_retriever.retrieve(query_bundle)
+        nodes_a = self.dense_retriever.retrieve(answer_a_bundle)
+        nodes_b = self.dense_retriever.retrieve(answer_b_bundle)
+        nodes_c = self.dense_retriever.retrieve(answer_c_bundle)
+        nodes_d = self.dense_retriever.retrieve(answer_d_bundle)
         node_with_scores = []
         node_with_scores.extend(nodes_query)
         node_with_scores.extend(nodes_a)
