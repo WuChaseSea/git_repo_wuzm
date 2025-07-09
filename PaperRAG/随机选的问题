@@ -1,0 +1,102 @@
+[
+    {
+        "paper_id": "1",
+        "question": "Which of the following statements are correct about how LLMs use KG information for question answering?\nA. Linearized triplets are less likely to introduce noise than natural language text when used as input to LLMs, and are more conducive to the model extracting key information.\nB. When dealing with multi-hop questions, knowledge provided in the form of natural language text may introduce irrelevant information and affect the performance of LLMs because it needs to reason between sentences or paragraphs.\nC. Different LLMs show consistent preferences when dealing with sorted linearized triplets, which suggests that there is a universal optimal sorting strategy.\nD. For linearized triplets, the attention mechanism of LLMs tends to focus more on the parts related to the answer, which helps the model extract the answer.",
+        "correct_answer": "ABD"
+    },
+    {
+        "paper_id": "5",
+        "question": "To improve the performance of LLMs in KG completion tasks, which of the following strategies are highlighted in the paper to enhance the model’s ability to handle structured knowledge?\nA. Direct fine-tuning of LLMs on KG data, which improves the model's capacity to understand the relationships and entities present in the graph.\nB. Leveraging external knowledge sources, such as knowledge graphs, to complement the LLM's training data and help the model generate more contextually appropriate and accurate completions.\nC. The integration of entity linking and relational reasoning mechanisms into LLMs, allowing them to better infer missing relationships in KGs by utilizing structured knowledge from the graph.\nD. Utilizing the encoder-decoder architecture of the LLM to directly predict missing links in the KG, relying solely on the model's internal language understanding without external data input.",
+        "correct_answer": "ABC"
+    },
+    {
+        "paper_id": "13",
+        "question": "Based on the experimental results of the MATEval framework (Tables 1, 2, 3), which strategy combinations show the largest improvement in Spearman correlation coefficient (ρ) compared to the second-best strategy (Δρ≥0.1)?\nA. SR+CoT on 'Repetition ' and 'Inappropriate Lexical Choice ' in the Ant dataset\nB. SR+CoT on 'Logical Inconsistency ' in the ROC dataset and 'Logical Inconsistency ' in the LOT dataset\nC. SR+CoT on 'Discontinuity ' and 'Repetition ' in the Ant dataset\nD. SR+CoT on 'Inappropriate Lexical Choice ' in the Ant dataset and 'Logical Inconsistency ' in the Ant dataset",
+        "correct_answer": "BD"
+    },
+    {
+        "paper_id": "14",
+        "question": "Which of the following are true about DEE's efficiency?\nA. It has inference speed comparable to smaller language models.\nB. It is suitable for real-time applications.\nC. It is more efficient than traditional methods.\nD. It requires less computational resources than large language models.",
+        "correct_answer": "ABD"
+    },
+    {
+        "paper_id": "15",
+        "question": "In Example 3, list the number of axioms that are contained in the resulting set of wanted inclusion assertions or the set of unwanted inclusion assertions (note that a complete revision state separates a TBox into a set of wanted inclusion assertions and a set of unwanted inclusion assertions)?\nA. 2\nB. 4\nC. 3\nD. 1",
+        "correct_answer": "AD"
+    },
+    {
+        "paper_id": "29",
+        "question": "Which of the following components are explicitly mentioned in CodeGRAG's methodology for bridging the syntactic gap between natural language and programming languages?\nA. Incorporation of adaptive inference mechanisms for contextual variable typing across multi-dimensional flow representations.\nB. Combination of two types of flow computational graphs with bidirectional signaling mechanisms.\nC. Employment of graph neural network with soft prompting expert models to encode execution pathways in order to extract the information from code blocks.\nD. Extraction of abstract syntax trees to construct structural representations.",
+        "correct_answer": "BD"
+    },
+    {
+        "paper_id": "29",
+        "question": "What metrics or criteria were used in the evaluation of CodeGRAG's performance, according to the experimental results?\nA. BLEU score for semantic similarity between generated and reference code.\nB. Pass@1 accuracy on the HumanEval-X and CodeForce datasets.\nC. Pass@1 accuracy for testing the effects of GNN expert model.\nD. Execution time optimization for cross-lingual compilation.",
+        "correct_answer": "BC"
+    },
+    {
+        "paper_id": "21",
+        "question": "Which of the following statements about the experimental results in the article are correct?\nA. On the TACRED dataset, the micro-F1 score of the LLaMA-7B + RE4 framework significantly surpasses that of the GPT-3 model(175b), due to the schema constrain of proposed RE4 method.\nB. This work demonstrates that open-source LLMs (e.g., LLaMA can outperform proprietary large models in complex tasks (e.g., RE) through framework optimization.\nC. The proposed method with LLaMA-7b achieves results comparable to, or even surpassing, those of ultra-large models such as GPT-3 across multiple datasets.\nD. The RE4 framework enhances parameter efficiency in mid-sized open-source models (<10B. far beyond traditional supervised models through ontology knowledge distillation and reasoning optimization.",
+        "correct_answer": "ABC"
+    },
+    {
+        "paper_id": "32",
+        "question": "In advanced retrieval-augmented generation systems like Astute RAG, which of the following best describes the considerations for achieving optimal knowledge alignment?\nA. Ensuring that the initial retrieval process yields highly accurate and relevant documents to minimize noise and potential conflicts in the augmented context provided to the large language model, thereby increasing the likelihood of generating reliable answers.\nB. Strategically designing prompts to effectively guide the large language model in prioritizing reliable information, resolving potential knowledge conflicts between internal knowledge and external sources, and generating accurate responses, especially when retrieval results are imperfect.\nC. Primarily focusing on enhancing the quality and credibility of the external knowledge corpus by implementing rigorous data cleaning and validation procedures before indexing for retrieval, thereby reducing the introduction of misinformation at the source.\nD. Dynamically adjusting the hyperparameters of the large language model during the generation phase to encourage greater coherence with the retrieved context, regardless of the authenticity of the retrieved information, in the hope that the model can better utilize external information.",
+        "correct_answer": "ABC"
+    },
+    {
+        "paper_id": "34",
+        "question": "According to the paper, which of the following statements about KB reasoning phase is correct?\nA. Its hard for LLMs to genrate accurate entities and relations due to its inablity to directly process KB structured infomation.\nB. The semantic similarity and meta-function domain defination makes sure both entity mentions and relation mentions can be parsed easily.\nC. For the entity linking step, the paper first uses the pre-trained embedding model SimCSE to generate vector representations for all entity surface names in the knowledge base.\nD. During linking, the method initially employs a similay matching strategy, selecting all entities whose surface names exactly match the mention as candidates.",
+        "correct_answer": "ABC"
+    },
+    {
+        "paper_id": "34",
+        "question": "Which of the following statements is correct about the experimet part of this paper?\nA. Since the Codex model family has been deprecated, this paper choose OpenAI's GPT-3.5-turbo model for our experiments.\nB. In the ablation study section, theis paper investigates the necessity of related relations, instructions and demonstration examples.\nC. Experiments shows that, by converting logical form generation into code generation, the method leverages the LLM's familiarity with code, improving format accuracy.\nD. This paper employs the Format Error Rate to assess the percentage of semantic form generated by different methods that adhere to the grammar of S-Expression.",
+        "correct_answer": "ABCD"
+    },
+    {
+        "paper_id": "39",
+        "question": "According to this paper, which statements below explain the capability of the RoG framework?\nA. RoG retrieves relevant reasoning paths from the KG， which is created by the author containing question entities in these two datasets.\nB. Reasoning on a faithful KGs could migate the hallucination problem of LLMs which enhance the quality of the response.\nC. RoG extracts not only the knowledge contained within knowledge graphs, but also captures the structural information of the graph.\nD. RoG is a specialized framework for GPTs, it cannot be utilized with DeepSeek-R1 when implementing long chain of thought.",
+        "correct_answer": "ABC"
+    },
+    {
+        "paper_id": "44",
+        "question": "In what ways does the EFSUM approach differ from previous KG-to-text systems?\nA. EFSUM generates summaries tailored to the question context\nB. KG-to-text systems are trained on WebNLG-style sentence realization\nC. EFSUM uses explicit logical rules for relation rewriting\nD. EFSUM includes hallucination-aware filtering in training",
+        "correct_answer": "AD"
+    },
+    {
+        "paper_id": "46",
+        "question": "To build KG for Computer Science, I should follow steps mentioned in the paper:\nA. Use domain corpus collected by a domain expert Professor Colin Masters at the University of Melbourne.\nB. Use PTC to extract relevant entities.\nC. Use LLM to extract relationships.\nD. Use LLM to extract relational triples.",
+        "correct_answer": "BCD"
+    },
+    {
+        "paper_id": "58",
+        "question": "In the MCTS reward function design, rStar avoids using self-rewarding for intermediate nodes. Based on the ablation study, which of the following is NOT true about the percentage drop in accuracy when replacing rStar's reward function with self-evaluation for LLaMA3-8B on GSM8K?\nA. 4.10%\nB. 5.51%\nC. 94.49%\nD. Both A and B are correct but answer A is the primary metric",
+        "correct_answer": "CD" "这道题答案有问题❌"
+    },
+    {
+        "paper_id": "58",
+        "question": "The rStar paper reports that LLaMA2-7B's accuracy on GSM8K improves from 12.51% (few-shot CoT) to 63.91% using rStar. Assuming the total number of test questions in GSM8K is 1,319 (standard test set size), which of the following does NOT best approximate the number of additional correct answers enabled by rStar?\nA. ~677\nB. ~678\nC. ~6,700\nD. ~843",
+        "correct_answer": "CD"
+    },
+    {
+        "paper_id": "58",
+        "question": "The ablation study tests different discriminator models for LLaMA3-8B-Instruct on GSM8\nK. If using GPT-4 as the discriminator improves accuracy from 91.13% (Phi3-Mini) to 92.57%, which of the following is NOT true about the marginal gain compared to using the generator's majority voting baseline (88.70%)?\nA. 3.87%\nB. 1.58%\nC. The gain is statistically insignificant because GPT-4 is not an SLM\nD. Both A and B are correct, but the paper emphasizes absolute gains ",
+        "correct_answer": "BCD" "答案✅"
+    },
+    {
+        "paper_id": "65",
+        "question": "Based on the experimental results in the paper, which of the following conclusions are valid regarding GPT-4’s performance as a text-based world simulator?\nA. GPT-4 achieves higher accuracy in predicting full game states compared to state difference predictions for dynamic transitions, as generating the entire state reduces format-related errors.\nB. Static transitions, where no changes occur to object properties, are simulated with significantly higher accuracy than dynamic transitions, even when explicit game rules are omitted.\nC. Providing LLM-generated rules as context yields comparable performance to human-authored rules, indicating that LLMs can autonomously generate reliable simulation guidelines.\nD. GPT-4’s ability to predict game progress metrics, such as reward and termination status, is largely unaffected by the presence or absence of contextual rules describing scoring conditions.",
+        "correct_answer": "AC"
+    },
+    {
+        "paper_id": "80",
+        "question": "Which factors were identified as influencing variations in LLM-generated acceptance rates for job applicants?\nA. Occupational roles with strong gender stereotypes, such as secretary or mechanic, amplify biases against gender-mismatched candidates.\nB. Higher qualification levels (e.g., 'highly qualified') reduce demographic disparities, as models prioritize merit over name-based biases.\nC. Larger model sizes correlate with reduced variation in acceptance rates across demographic groups, suggesting improved fairness.\nD. The inclusion of synthetic resumes confounds results by introducing uncontrolled variables related to applicant experience.",
+        "correct_answer": "ABD"
+    },
+    {
+        "paper_id": "84",
+        "question": "Which of the following statements about the capabilities of LLMs in humor editing and dataset creation, as discussed in the paper, are correct?\nA. LLMs like GPT-4 and GPT-3.5 consistently outperform human satirical writers in generating humorous headlines when prompted to edit non-humorous texts.\nB. Synthetic unfunned data generated by GPT-4 results in humor classifiers with smaller accuracy drops compared to models trained on human-edited data, as validated on the Unfun corpus.\nC. The ROBERTA-SWAP baseline method, which replaces tokens based on low probability ratios, achieves comparable coherence and realness ratings to human crowd-workers in unfunning tasks.\nD. GPT-4’s ability to 'unfun' humor generalizes to code-mixed English-Hindi tweets, producing synthetic data rated as highly coherent and non-humorous by bilingual annotators.",
+        "correct_answer": "CD"
+    },
+]
