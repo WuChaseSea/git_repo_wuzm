@@ -102,7 +102,6 @@ class DocumentRetrievalPipeline(BaseFileIndexRetriever):
 
     @Node.auto(depends_on=["embedding", "VS", "DS"])
     def vector_retrieval(self) -> VectorRetrieval:
-        import ipdb;ipdb.set_trace()
         return VectorRetrieval(
             embedding=self.embedding,
             vector_store=self.VS,

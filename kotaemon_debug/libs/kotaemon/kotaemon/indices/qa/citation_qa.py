@@ -195,6 +195,7 @@ class AnswerWithContextPipeline(BaseComponent):
         images: list[str] = [],
         **kwargs,
     ) -> Generator[Document, None, Document]:
+        import ipdb;ipdb.set_trace()
         history = kwargs.get("history", [])
         print(f"Got {len(images)} images")
         # check if evidence exists, use QA prompt

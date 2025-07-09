@@ -243,6 +243,16 @@ KH_LLMS["google"] = {
         "model_name": "gemini-1.5-flash",
         "api_key": GOOGLE_API_KEY,
     },
+    "default": False,
+}
+import os
+QWEN_API_KEY = os.getenv("DASHSCOPE_API_KEY")
+KH_LLMS["qwen"] = {
+    "spec": {
+        "__type__": "kotaemon.llms.chats.LCQwenChat",
+        "model_name": "qwen-plus",
+        "api_key": QWEN_API_KEY,
+    },
     "default": not IS_OPENAI_DEFAULT,
 }
 KH_LLMS["groq"] = {
@@ -293,7 +303,8 @@ KH_EMBEDDINGS["google"] = {
 KH_EMBEDDINGS["bge"] = {
     "spec": {
         "__type__": "kotaemon.embeddings.LCBGEEmbeddings",
-        "model_name": "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3",
+        # "model_name": "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3",
+        "model_name": "E:/Models/embedding/bge-m3",
     },
     "default": not IS_OPENAI_DEFAULT,
 }

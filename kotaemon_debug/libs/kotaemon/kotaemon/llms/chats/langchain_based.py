@@ -23,7 +23,19 @@ class LCChatMixin:
 
     def __init__(self, stream: bool = False, **params):
         self._lc_class = self._get_lc_class()
-        self._obj = self._lc_class(**params)
+        try:
+            self._obj = self._lc_class(**params)
+        except:
+            import ipdb;ipdb.set_trace()
+            if params['model'] == 'qwen-plus':
+                self._obj = self._lc_class({
+                    "model": params['model'],
+                    "model_server": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+                    "api_key": params['qwen_api_key'],
+                    'generate_cfg': {
+                        'temperature': params['temperature']
+                    }
+                })
         self._kwargs: dict = params
         self._stream = stream
 
@@ -326,6 +338,50 @@ class LCGeminiChat(LCChatMixin, ChatLLM):  # type: ignore
             raise ImportError("Please install langchain-google-genai")
 
         return ChatGoogleGenerativeAI
+
+
+class LCQwenChat(LCChatMixin, ChatLLM):  # type: ignore
+    api_key: str = Param(
+        help="API key (https://aistudio.google.com/app/apikey)", required=True
+    )
+    model_name: str = Param(
+        help=(
+            "Model name to use (https://cloud.google"
+            ".com/vertex-ai/generative-ai/docs/learn/models)"
+        ),
+        required=True,
+    )
+
+    def _get_tool_call_kwargs(self):
+        return {
+            "tool_config": {
+                "function_calling_config": {
+                    "mode": "ANY",
+                }
+            }
+        }
+
+    def __init__(
+        self,
+        api_key: str | None = None,
+        model_name: str | None = None,
+        temperature: float = 0.7,
+        **params,
+    ):
+        super().__init__(
+            qwen_api_key=api_key,
+            model=model_name,
+            temperature=temperature,
+            **params,
+        )
+
+    def _get_lc_class(self):
+        try:
+            from qwen_agent.llm import get_chat_model
+        except ImportError:
+            raise ImportError("Please install qwen_agent")
+
+        return get_chat_model
 
 
 class LCCohereChat(LCChatMixin, ChatLLM):  # type: ignore
