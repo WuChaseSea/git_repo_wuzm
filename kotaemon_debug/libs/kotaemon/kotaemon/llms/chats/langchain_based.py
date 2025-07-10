@@ -26,7 +26,6 @@ class LCChatMixin:
         try:
             self._obj = self._lc_class(**params)
         except:
-            import ipdb;ipdb.set_trace()
             if params['model'] == 'qwen-plus':
                 self._obj = self._lc_class({
                     "model": params['model'],
@@ -377,11 +376,11 @@ class LCQwenChat(LCChatMixin, ChatLLM):  # type: ignore
 
     def _get_lc_class(self):
         try:
-            from qwen_agent.llm import get_chat_model
+            from langchain_community.chat_models.tongyi import ChatTongyi
         except ImportError:
-            raise ImportError("Please install qwen_agent")
+            raise ImportError("Please install langchain_community")
 
-        return get_chat_model
+        return ChatTongyi
 
 
 class LCCohereChat(LCChatMixin, ChatLLM):  # type: ignore
