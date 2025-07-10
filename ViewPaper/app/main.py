@@ -15,13 +15,6 @@ if config("KH_FIRST_SETUP", default=False, cast=bool):
     KH_APP_DATA_EXISTS = False
 
 
-def toggle_first_setup_visibility():
-    global KH_APP_DATA_EXISTS
-    is_first_setup = not KH_DEMO_MODE and not KH_APP_DATA_EXISTS
-    KH_APP_DATA_EXISTS = True
-    return gr.update(visible=is_first_setup), gr.update(visible=not is_first_setup)
-
-
 class App(BaseApp):
     def ui(self):
         """Render the UI"""

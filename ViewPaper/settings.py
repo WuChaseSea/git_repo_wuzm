@@ -11,4 +11,4 @@ this_file = getframeinfo(cur_frame).filename
 this_dir = Path(this_file).parent
 
 VP_PACKAGE_NAME = "viewpaper_app"
-VP_APP_VERSION = config("KH_APP_VERSION", None)
+VP_APP_VERSION = config("VP_APP_VERSION", None)

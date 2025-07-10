@@ -13,6 +13,7 @@ from app.settings import BaseSettingGroup, SettingGroup, SettingReasoningGroup
 from theflow.settings import settings
 from theflow.utils.modules import import_dotted_string
 
+
 BASE_PATH = os.environ.get("GR_FILE_ROOT_PATH", "")
 
 
@@ -62,7 +63,6 @@ class BaseApp:
             self._svg_js = fi.read()
 
         self._favicon = str(dir_assets / "img" / "favicon.svg")
-
         self.default_settings = SettingGroup(
             application=BaseSettingGroup(settings=settings.SETTINGS_APP),
             reasoning=SettingReasoningGroup(settings=settings.SETTINGS_REASONING),
@@ -75,12 +75,8 @@ class BaseApp:
         self.register_reasonings()
         self.initialize_indices()
 
-        self.default_settings.reasoning.finalize()
-        self.default_settings.index.finalize()
-        self.settings_state = gr.State(self.default_settings.flatten())
-
         self.user_id = gr.State("default" if not self.f_user_management else None)
-
+    
     def initialize_indices(self):
         """Create the index manager, start indices, and register to app settings"""
         self.index_manager = IndexManager(self)
@@ -91,7 +87,7 @@ class BaseApp:
             self.default_settings.index.options[index.id] = BaseSettingGroup(
                 settings=options
             )
-
+    
     def register_reasonings(self):
         """Register the reasoning components from app settings"""
         if getattr(settings, "KH_REASONINGS", None) is None:
@@ -205,7 +201,6 @@ class BaseApp:
             head=external_js,
         ) as demo:
             self.app = demo
-            self.settings_state.render()
             self.user_id.render()
 
             self.ui()
