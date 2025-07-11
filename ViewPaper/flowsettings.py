@@ -303,8 +303,8 @@ KH_EMBEDDINGS["google"] = {
 KH_EMBEDDINGS["bge"] = {
     "spec": {
         "__type__": "kotaemon.embeddings.LCBGEEmbeddings",
-        # "model_name": "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3",
-        "model_name": "E:/Models/embedding/bge-m3",
+        "model_name": "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3",
+        # "model_name": "E:/Models/embedding/bge-m3",
     },
     "default": not IS_OPENAI_DEFAULT,
 }

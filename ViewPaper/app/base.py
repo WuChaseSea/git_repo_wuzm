@@ -71,9 +71,9 @@ class BaseApp:
         self._callbacks: dict[str, list] = {}
         self._events: dict[str, list] = {}
 
-        self.register_extensions()
-        self.register_reasonings()
-        self.initialize_indices()
+        self.register_extensions()  # 注册扩展，不过都是空的
+        self.register_reasonings()  # 注册推理链，但是目前用的还是ktem的
+        self.initialize_indices()  #  # 注册文件索引
 
         self.user_id = gr.State("default" if not self.f_user_management else None)
     
@@ -82,7 +82,7 @@ class BaseApp:
         self.index_manager = IndexManager(self)
         self.index_manager.on_application_startup()
 
-        for index in self.index_manager.indices:
+        for index in self.index_manager.indices:  # file index, graph index, light graph index
             options = index.get_user_settings()
             self.default_settings.index.options[index.id] = BaseSettingGroup(
                 settings=options
