@@ -12,9 +12,9 @@ import gradio as gr
 import pandas as pd
 from gradio.data_classes import FileData
 from gradio.utils import NamedString
-from ktem.app import BasePage
-from ktem.db.engine import engine
-from ktem.utils.render import Render
+from app.base import BasePage
+from app.db.engine import engine
+from app.utils.render import Render
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from theflow.settings import settings as flowsettings

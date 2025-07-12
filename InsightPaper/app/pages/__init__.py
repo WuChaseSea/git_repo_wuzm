@@ -8,6 +8,7 @@ import gradio as gr
 from decouple import config
 from app.base import BasePage
 from app.files.ui import File
+from app.utils.hf_papers import get_recommended_papers
 
 from app.reasoning.prompt_optimization.mindmap import MINDMAP_HTML_EXPORT_TEMPLATE
 
@@ -213,7 +214,7 @@ class ChatPage(BasePage):
 
             with gr.Column(scale=1, elem_id="conv-settings-panel") as self.conv_column:
                 self.chat_control = ConversationControl(self._app)
-
+                
                 for index_id, index in enumerate(self._app.index_manager.indices):
                     index.selector = None
                     index_ui = index.get_selector_component_ui()
@@ -395,6 +396,32 @@ class ChatPage(BasePage):
         else:
             plot = gr.update(visible=False)
         return plot
+    
+    def on_register_events(self):
+        # first index paper recommendation
+        if KH_DEMO_MODE and len(self._indices_input) > 0:
+            self._indices_input[1].change(
+                self.get_recommendations,
+                inputs=[self.first_selector_choices, self._indices_input[1]],
+                outputs=[self.related_papers],
+            ).then(
+                fn=None,
+                inputs=None,
+                outputs=None,
+                js=recommended_papers_js,
+            )
+
+    def get_recommendations(self, first_selector_choices, file_ids):
+        first_selector_choices_map = {
+            item[1]: item[0] for item in first_selector_choices
+        }
+        file_names = [first_selector_choices_map[file_id] for file_id in file_ids]
+        if not file_names:
+            return ""
+
+        first_file_name = file_names[0].split(".")[0].replace("_", " ")
+        return get_recommended_papers(first_file_name)
+
 
     def _on_app_created(self):
         if KH_DEMO_MODE:

@@ -11,6 +11,7 @@ from app.exceptions import HookAlreadyDeclared, HookNotDeclared
 from app.index import IndexManager
 from app.settings import BaseSettingGroup, SettingGroup, SettingReasoningGroup
 import settings
+# from theflow.settings import settings
 from theflow.utils.modules import import_dotted_string
 
 
@@ -72,9 +73,12 @@ class BaseApp:
         self._events: dict[str, list] = {}
 
         self.register_extensions()
-        self.register_reasonings()
-        self.initialize_indices()
+        self.register_reasonings()  # 注册pipeline
+        self.initialize_indices()  # 初始化索引
 
+        self.default_settings.reasoning.finalize()
+        self.default_settings.index.finalize()
+        self.settings_state = gr.State(self.default_settings.flatten())
         self.user_id = gr.State("default" if not self.f_user_management else None)
 
     def initialize_indices(self):
@@ -92,7 +96,7 @@ class BaseApp:
         """Register the reasoning components from app settings"""
         if getattr(settings, "VP_REASONINGS", None) is None:
             return
-
+        
         for value in settings.VP_REASONINGS:
             reasoning_cls = import_dotted_string(value, safe=False)
             rid = reasoning_cls.get_info()["id"]
@@ -104,12 +108,12 @@ class BaseApp:
 
     def register_extensions(self):
         """Register installed extensions"""
-        self.exman = pluggy.PluginManager("ktem")
+        self.exman = pluggy.PluginManager("vp")
         self.exman.add_hookspecs(extension_protocol)
-        self.exman.load_setuptools_entrypoints("ktem")
+        self.exman.load_setuptools_entrypoints("vp")
 
         # retrieve and register extension declarations
-        extension_declarations = self.exman.hook.ktem_declare_extensions()
+        extension_declarations = self.exman.hook.vp_declare_extensions()
         for extension_declaration in extension_declarations:
             # if already in database, with the same version: skip
 
@@ -201,15 +205,42 @@ class BaseApp:
             head=external_js,
         ) as demo:
             self.app = demo
+            self.settings_state.render()
             self.user_id.render()
 
             self.ui()
 
+            self.declare_public_events()
+            self.subscribe_public_events()
+            self.register_events()
             self.on_app_created()
 
             demo.load(None, None, None, js=self._pdf_view_js)
 
         return demo
+    
+    def declare_public_events(self):
+        """Declare an event for the app"""
+        for event in self.public_events:
+            self.declare_event(event)
+        
+        for value in self.__dict__.values():
+            if isinstance(value, BasePage):
+                value.declare_public_events()
+
+    def subscribe_public_events(self):
+        """Subscribe to an event"""
+        self.on_subscribe_public_events()
+        for value in self.__dict__.values():
+            if isinstance(value, BasePage):
+                value.subscribe_public_events()
+
+    def register_events(self):
+        """Register all events"""
+        self.on_register_events()
+        for value in self.__dict__.values():
+            if isinstance(value, BasePage):
+                value.register_events()
 
     def on_app_created(self):
         """Execute on app created callbacks"""

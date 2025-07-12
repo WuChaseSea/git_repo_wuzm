@@ -2,7 +2,7 @@ from typing import Optional, Type
 
 from app.db.models import engine
 from sqlmodel import Session, select
-from theflow.settings import settings
+import settings
 from theflow.utils.modules import import_dotted_string
 
 from .base import BaseIndex
@@ -151,7 +151,7 @@ class IndexManager:
             self._index_types[f"{index.__module__}.{index.__qualname__}"] = index
 
         # developer-defined custom index types
-        for index_str in settings.KH_INDEX_TYPES:
+        for index_str in settings.VP_INDEX_TYPES:
             cls: Type[BaseIndex] = import_dotted_string(index_str, safe=False)
             self._index_types[f"{cls.__module__}.{cls.__qualname__}"] = cls
 
@@ -183,7 +183,7 @@ class IndexManager:
         """
         self.load_index_types()
 
-        for index in settings.KH_INDICES:
+        for index in settings.VP_INDICES:
             if not self.exists(name=index["name"]):
                 self.build_index(**index)
 

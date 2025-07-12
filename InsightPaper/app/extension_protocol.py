@@ -1,11 +1,11 @@
 import pluggy
 
-hookspec = pluggy.HookspecMarker("ktem")
-hookimpl = pluggy.HookimplMarker("ktem")
+hookspec = pluggy.HookspecMarker("vp")
+hookimpl = pluggy.HookimplMarker("vp")
 
 
 @hookspec
-def ktem_declare_extensions() -> dict:  # type: ignore
+def vp_declare_extensions() -> dict:  # type: ignore
     """Called before the run() function is executed.
 
     This hook is called without any arguments, and should return a dictionary.
