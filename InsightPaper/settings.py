@@ -105,4 +105,18 @@ VP_FEATURE_CHAT_SUGGESTION = config(
 
 ### 数据库配置
 VP_DATABASE = f"sqlite:///{VP_USER_DATA_DIR / 'sql.db'}"
+VP_FILESTORAGE_PATH = str(VP_USER_DATA_DIR / "files")
+VP_DOCSTORE = {
+    # "__type__": "kotaemon.storages.ElasticsearchDocumentStore",
+    # "__type__": "kotaemon.storages.SimpleFileDocumentStore",
+    "__type__": "kotaemon.storages.LanceDBDocumentStore",
+    "path": str(VP_USER_DATA_DIR / "docstore"),
+}
+VP_VECTORSTORE = {
+    # "__type__": "kotaemon.storages.LanceDBVectorStore",
+    "__type__": "kotaemon.storages.ChromaVectorStore",
+    # "__type__": "kotaemon.storages.MilvusVectorStore",
+    # "__type__": "kotaemon.storages.QdrantVectorStore",
+    "path": str(VP_USER_DATA_DIR / "vectorstore"),
+}
 VP_ENABLE_ALEMBIC = False

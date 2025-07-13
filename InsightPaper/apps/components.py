@@ -5,7 +5,7 @@ from functools import cache
 from pathlib import Path
 from typing import Optional
 
-from theflow.settings import settings
+import settings
 from theflow.utils.modules import deserialize
 
 from models.base import BaseComponent
@@ -14,7 +14,7 @@ from models.storages import BaseDocumentStore, BaseVectorStore
 logger = logging.getLogger(__name__)
 
 
-filestorage_path = Path(settings.KH_FILESTORAGE_PATH)
+filestorage_path = Path(settings.VP_FILESTORAGE_PATH)
 filestorage_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -22,7 +22,7 @@ filestorage_path.mkdir(parents=True, exist_ok=True)
 def get_docstore(collection_name: str = "default") -> BaseDocumentStore:
     from copy import deepcopy
 
-    ds_conf = deepcopy(settings.KH_DOCSTORE)
+    ds_conf = deepcopy(settings.VP_DOCSTORE)
     ds_conf["collection_name"] = collection_name
     return deserialize(ds_conf, safe=False)
 
@@ -31,7 +31,7 @@ def get_docstore(collection_name: str = "default") -> BaseDocumentStore:
 def get_vectorstore(collection_name: str = "default") -> BaseVectorStore:
     from copy import deepcopy
 
-    vs_conf = deepcopy(settings.KH_VECTORSTORE)
+    vs_conf = deepcopy(settings.VP_VECTORSTORE)
     vs_conf["collection_name"] = collection_name
     return deserialize(vs_conf, safe=False)
 

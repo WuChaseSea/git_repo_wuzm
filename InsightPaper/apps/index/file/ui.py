@@ -17,14 +17,14 @@ from apps.db.engine import engine
 from apps.utils.render import Render
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-import settings
+import settings as global_settings
 
 from ...utils.commands import WEB_SEARCH_COMMAND
 from ...utils.rate_limit import check_rate_limit
 from .utils import download_arxiv_pdf, is_arxiv_url
 
-VP_DEMO_MODE = getattr(settings, "VP_DEMO_MODE", False)
-VP_SSO_ENABLED = getattr(settings, "VP_SSO_ENABLED", False)
+VP_DEMO_MODE = getattr(global_settings, "VP_DEMO_MODE", False)
+VP_SSO_ENABLED = getattr(global_settings, "VP_SSO_ENABLED", False)
 DOWNLOAD_MESSAGE = "Start download"
 MAX_FILENAME_LENGTH = 20
 MAX_FILE_COUNT = 200
@@ -494,18 +494,18 @@ class FileIndexPage(BasePage):
         if source:
             target_file_name = Path(source[0].name)
         zip_files = []
-        for file_name in os.listdir(settings.VP_CHUNKS_OUTPUT_DIR):
+        for file_name in os.listdir(global_settings.VP_CHUNKS_OUTPUT_DIR):
             if target_file_name.stem in file_name:
                 zip_files.append(
-                    os.path.join(settings.VP_CHUNKS_OUTPUT_DIR, file_name)
+                    os.path.join(global_settings.VP_CHUNKS_OUTPUT_DIR, file_name)
                 )
-        for file_name in os.listdir(settings.VP_MARKDOWN_OUTPUT_DIR):
+        for file_name in os.listdir(global_settings.VP_MARKDOWN_OUTPUT_DIR):
             if target_file_name.stem in file_name:
                 zip_files.append(
-                    os.path.join(settings.VP_MARKDOWN_OUTPUT_DIR, file_name)
+                    os.path.join(global_settings.VP_MARKDOWN_OUTPUT_DIR, file_name)
                 )
         zip_file_path = os.path.join(
-            settings.VP_ZIP_OUTPUT_DIR, target_file_name.stem
+            global_settings.VP_ZIP_OUTPUT_DIR, target_file_name.stem
         )
         with zipfile.ZipFile(f"{zip_file_path}.zip", "w") as zipMe:
             for file in zip_files:
@@ -532,7 +532,7 @@ class FileIndexPage(BasePage):
 
         # create a temporary file with a path to export
         output_file_path = os.path.join(
-            settings.VP_ZIP_OUTPUT_DIR, target_file_name.stem + ".html"
+            global_settings.VP_ZIP_OUTPUT_DIR, target_file_name.stem + ".html"
         )
         with open(output_file_path, "w") as f:
             f.write(file_html)
@@ -553,13 +553,13 @@ class FileIndexPage(BasePage):
             raise gr.Error("This feature is not available for private collection.")
 
         zip_files = []
-        for file_name in os.listdir(settings.VP_CHUNKS_OUTPUT_DIR):
-            zip_files.append(os.path.join(settings.VP_CHUNKS_OUTPUT_DIR, file_name))
-        for file_name in os.listdir(settings.VP_MARKDOWN_OUTPUT_DIR):
+        for file_name in os.listdir(global_settings.VP_CHUNKS_OUTPUT_DIR):
+            zip_files.append(os.path.join(global_settings.VP_CHUNKS_OUTPUT_DIR, file_name))
+        for file_name in os.listdir(global_settings.VP_MARKDOWN_OUTPUT_DIR):
             zip_files.append(
-                os.path.join(settings.VP_MARKDOWN_OUTPUT_DIR, file_name)
+                os.path.join(global_settings.VP_MARKDOWN_OUTPUT_DIR, file_name)
             )
-        zip_file_path = os.path.join(settings.VP_ZIP_OUTPUT_DIR, "all")
+        zip_file_path = os.path.join(global_settings.VP_ZIP_OUTPUT_DIR, "all")
         with zipfile.ZipFile(f"{zip_file_path}.zip", "w") as zipMe:
             for file in zip_files:
                 arcname = Path(file)
@@ -1110,7 +1110,7 @@ class FileIndexPage(BasePage):
                 yield "", ""
                 return
             files, unzip_errors = self._may_extract_zip(
-                files, settings.VP_ZIP_INPUT_DIR
+                files, global_settings.VP_ZIP_INPUT_DIR
             )
             errors = self.validate_files(files)
             errors.extend(unzip_errors)

@@ -4,9 +4,9 @@ import gradio as gr
 import requests
 from decouple import config
 from apps.base import BasePage
-from ktem.embeddings.manager import embedding_models_manager as embeddings
-from ktem.llms.manager import llms
-from ktem.rerankings.manager import reranking_models_manager as rerankers
+# from ktem.embeddings.manager import embedding_models_manager as embeddings
+# from ktem.llms.manager import llms
+# from ktem.rerankings.manager import reranking_models_manager as rerankers
 import settings
 
 VP_OLLAMA_URL = getattr(settings, "VP_OLLAMA_URL", "http://localhost:11434/v1/")
