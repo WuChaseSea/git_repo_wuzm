@@ -9,7 +9,6 @@ pipeline_storage_bge_base/
 pipeline_storage_cache_bge_base/
 unstructuredio/
 .byaldi/
-db
 
 documents.pkl
 .DS_Store/

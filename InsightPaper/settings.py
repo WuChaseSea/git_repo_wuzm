@@ -4,7 +4,7 @@ from inspect import currentframe, getframeinfo
 from pathlib import Path
 
 from decouple import config
-from app.utils.lang import SUPPORTED_LANGUAGE_MAP
+from apps.utils.lang import SUPPORTED_LANGUAGE_MAP
 
 cur_frame = currentframe()
 if cur_frame is None:
@@ -23,9 +23,39 @@ if not VP_APP_VERSION:
         VP_APP_VERSION = "local"
 VP_ENABLE_FIRST_SETUP = config("KH_ENABLE_FIRST_SETUP", default=True, cast=bool)
 
+VP_DEMO_MODE = config("VP_DEMO_MODE", default=False, cast=bool)
+VP_OLLAMA_URL = config("VP_OLLAMA_URL", default="http://localhost:11434/v1/")
+
 VP_APP_DATA_DIR = this_dir / "viewpaper_app_data"
 VP_APP_DATA_EXISTS = VP_APP_DATA_DIR.exists()
 VP_APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# User data directory
+VP_USER_DATA_DIR = VP_APP_DATA_DIR / "user_data"
+VP_USER_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# markdown output directory
+VP_MARKDOWN_OUTPUT_DIR = VP_APP_DATA_DIR / "markdown_cache_dir"
+VP_MARKDOWN_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# chunks output directory
+VP_CHUNKS_OUTPUT_DIR = VP_APP_DATA_DIR / "chunks_cache_dir"
+VP_CHUNKS_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# zip output directory
+VP_ZIP_OUTPUT_DIR = VP_APP_DATA_DIR / "zip_cache_dir"
+VP_ZIP_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+# zip input directory
+VP_ZIP_INPUT_DIR = VP_APP_DATA_DIR / "zip_cache_dir_in"
+VP_ZIP_INPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+VP_FEATURE_CHAT_SUGGESTION = config(
+    "VP_FEATURE_CHAT_SUGGESTION", default=False, cast=bool
+)
+
+VP_SSO_ENABLED = config("VP_SSO_ENABLED", default=False, cast=bool)
+VP_USER_CAN_SEE_PUBLIC = None
 
 SETTINGS_APP: dict[str, dict] = {}
 SETTINGS_REASONING = {
@@ -49,11 +79,11 @@ SETTINGS_REASONING = {
 }
 
 VP_REASONINGS = [
-    "app.reasoning.simple.FullQAPipeline",
+    "apps.reasoning.simple.FullQAPipeline",
 ]
 
 VP_INDEX_TYPES = [
-    "app.index.file.FileIndex",
+    "apps.index.file.FileIndex",
 ]
 VP_INDICES = [
     {
@@ -65,7 +95,14 @@ VP_INDICES = [
             ),
             "private": True,
         },
-        "index_type": "app.index.file.FileIndex",
+        "index_type": "apps.index.file.FileIndex",
     },
 ]
 
+VP_FEATURE_CHAT_SUGGESTION = config(
+    "VP_FEATURE_CHAT_SUGGESTION", default=False, cast=bool
+)
+
+### 数据库配置
+VP_DATABASE = f"sqlite:///{VP_USER_DATA_DIR / 'sql.db'}"
+VP_ENABLE_ALEMBIC = False

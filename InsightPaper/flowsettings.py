@@ -4,7 +4,7 @@ from inspect import currentframe, getframeinfo
 from pathlib import Path
 
 from decouple import config
-from app.utils.lang import SUPPORTED_LANGUAGE_MAP
+from apps.utils.lang import SUPPORTED_LANGUAGE_MAP
 from theflow.settings.default import *  # noqa
 
 cur_frame = currentframe()
