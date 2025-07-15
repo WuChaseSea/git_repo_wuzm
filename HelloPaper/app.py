@@ -18,7 +18,7 @@ demo.queue().launch(
     favicon_path=app._favicon,
     inbrowser=True,
     allowed_paths=[
-        "assets",
+        "apps/assets",
         GRADIO_TEMP_DIR,
     ],
     share=VP_GRADIO_SHARE,
