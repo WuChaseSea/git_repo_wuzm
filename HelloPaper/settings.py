@@ -24,3 +24,5 @@ if not VP_APP_VERSION:
 VP_APP_DATA_DIR = this_dir / "viewpaper_app_data"
 VP_APP_DATA_EXISTS = VP_APP_DATA_DIR.exists()
 VP_APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+
