@@ -72,12 +72,12 @@ async def main(
     nodes_list, scores_list, answer_list = [], [], []
     all_rows = []
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        # if num < 224:
-        #     save_one_json = save_folder / f"{num}.json"
-        #     with open(save_one_json, encoding="utf-8") as f:
-        #         answer = json.loads(f.read())
-        #     results[num]["correct_answer"] = answer['correct_answer']
-        #     continue
+        if num < 225:
+            save_one_json = save_folder / f"{num}.json"
+            with open(save_one_json, encoding="utf-8") as f:
+                answer = json.loads(f.read())
+            results[num]["correct_answer"] = answer['correct_answer']
+            continue
         
         res = await rag_pipeline.run(query)
         # res = await rag_pipeline.process_quesiton(query)
@@ -106,9 +106,10 @@ async def main(
         row_data = [query["paper_id"]] + [query["question"]] + node_texts + [answer]
         columns = ["paper_id"] + ["query"] + topk_columns + ["answer"]
         all_rows.append(row_data)
-    df = pd.DataFrame(all_rows, columns=columns)
+    # import ipdb;ipdb.set_trace()
+    # df = pd.DataFrame(all_rows, columns=columns)
     # 保存为 CSV 文件
-    df.to_csv(str(save_folder / "retrieved_nodes.csv"), index=True, encoding="utf-8")
+    # df.to_csv(str(save_folder / "retrieved_nodes.csv"), index=True, encoding="utf-8")
 
     save_json = Path(save_folder) / "base_version.json"
     with open(str(save_json), "w", encoding="utf-8") as f:

@@ -156,5 +156,7 @@ top6 0.4356 top10 0.4311
 
 复赛提交记录
 
-* 使用查询改写对问题进行修改，提升密集查询的score，结果提交 0.44
-* 查询改写之后score确实提高了，但是分数下降，使用改写查询，但是LLM的问题仍使用改写之前的，0.4844
+* 1 使用查询改写对问题进行修改，提升密集查询的score，结果提交 0.44 result_bge_m3_vector8_fusai_rewritequery
+* 2 查询改写之后score确实提高了，但是分数下降，使用改写查询，但是LLM的问题仍使用改写之前的，0.4844 result_bge_m3_vector8_fusai_rewritequery_1
+* 3 在上一个的基础上对两者的查询结果进行合并，然后使用bge llm rerank， 0.4622 result_bge_m3_vector8_fusai_rewritequery_rerank
+* 4 在2的基础上直接合并两者的查询，0.4667 result_bge_m3_vector8_fusai_rewritequery_norerank

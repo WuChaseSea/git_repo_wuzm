@@ -334,8 +334,8 @@ class PaperRAGPipeline():
         else:
             node_with_scores_path = []
         node_with_scores = HybridRetriever.fusion([
+            node_with_scores,
             node_with_scores_rewrite,
-            node_with_scores_path,
         ])
         
         if self.reranker:
