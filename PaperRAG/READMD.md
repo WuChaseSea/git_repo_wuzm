@@ -153,3 +153,8 @@ Which of the following factors may cause multilingual large language models to s
 回答：\
 """ 0.4622
 top6 0.4356 top10 0.4311
+
+复赛提交记录
+
+* 使用查询改写对问题进行修改，提升密集查询的score，结果提交 0.44
+* 查询改写之后score确实提高了，但是分数下降，使用改写查询，但是LLM的问题仍使用改写之前的，0.4844

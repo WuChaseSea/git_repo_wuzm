@@ -16,10 +16,14 @@ QA_TEMPLATE = """\
 
 你首先一步一步的推理，然后根据题干给出正确答案，不需要给出推理过程，除了答案不要给出其他任何信息。
 
-接下来是1个例子：
-题干：
-Which of the following factors may cause multilingual large language models to show English bias when processing non-English languages?\nA. The model's training data mainly consists of English text.\nB. The model uses English as the central language in the middle layer for semantic understanding and reasoning.\nC. In the model's word embedding space, English word embeddings are more densely distributed and easier to be \"captured\" by the model.\nD. The model translates non-English text into English before translating it into the target language.
-答案：ABC
+接下来是2个例子：
+例子1:
+"question":Which of the following factors may cause multilingual large language models to show English bias when processing non-English languages?\nA. The model's training data mainly consists of English text.\nB. The model uses English as the central language in the middle layer for semantic understanding and reasoning.\nC. In the model's word embedding space, English word embeddings are more densely distributed and easier to be \"captured\" by the model.\nD. The model translates non-English text into English before translating it into the target language.
+"correct_answer": "ABC"
+
+例子2:
+"question": "The ablation study tests different discriminator models for LLaMA3-8B-Instruct on GSM8\nK. If using GPT-4 as the discriminator improves accuracy from 91.13% (Phi3-Mini) to 92.57%, which of the following is NOT true about the marginal gain compared to using the generator's majority voting baseline (88.70%)?\nA. 3.87%\nB. 1.58%\nC. The gain is statistically insignificant because GPT-4 is not an SLM\nD. Both A and B are correct, but the paper emphasizes absolute gains ",
+"correct_answer": "BCD"
 
 接下来是你需要根据查询内容进行回答的问题：
 

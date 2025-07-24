@@ -1,5 +1,5 @@
 work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
-result_dir: "result_bge_m3_vector_template_10"
+result_dir: "result_bge_m3_vector8_fusai_rewritequery_1"
 
 # 大语言模型参数
 llm_name: "qwen-plus-2025-01-25"
@@ -18,7 +18,7 @@ qdrant_url: "http://localhost:6333"
 reindex: false
 embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
 vector_size: 1024
-cache_path: "cache_bge_m3_300_doclingpdf"
+cache_path: "cache_bge_m3_300_doclingpdf_rebuild"
 collection_name: "ainops24"
 
 # 粗排参数

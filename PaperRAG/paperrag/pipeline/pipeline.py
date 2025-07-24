@@ -25,6 +25,7 @@ from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
 from .ingestion import get_node_content as _get_node_content
 from .rag import generation as _generation
+from ..utils.rewrite_query import rewrite_query
 
 nest_asyncio.apply()
 
@@ -240,6 +241,16 @@ class PaperRAGPipeline():
         )
         return res
     
+    def rewrite_query(self, query_str):
+        question_str = query_str.split('A.')[0].strip()
+        answer_a = query_str.split('A.')[1].split('B.')[0].strip()
+        answer_b = query_str.split('A.')[1].split('B.')[1].split('C.')[0].strip()
+        answer_c = query_str.split('A.')[1].split('B.')[1].split('C.')[1].split('D.')[0].strip()
+        answer_d = query_str.split('D.')[1].strip()
+        options = [answer_a, answer_b, answer_c, answer_d]
+        rewrite_result = rewrite_query(question_str, options, mode="default")
+        return rewrite_result
+    
     async def generation_with_knowledge_retrieval_four(
             self,
             query_str,
@@ -306,8 +317,14 @@ class PaperRAGPipeline():
     ):
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
+        query_bundle_rewrite = self.build_query_bundle(self.rewrite_query(query_str) + hyde_query)
         if self.retrieval_type == 1:
             node_with_scores = self.dense_retriever.retrieve(query_bundle)
+            node_with_scores_rewrite = self.dense_retriever.retrieve(query_bundle_rewrite)
+            node_scores = [i.score for i in node_with_scores]
+            node_scores_write = [i.score for i in node_with_scores_rewrite]
+            print(f"origin score: {node_scores}")
+            print(f"rewrite score: {node_scores_write}")
         elif self.retrieval_type == 2:
             node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         else:
@@ -317,7 +334,7 @@ class PaperRAGPipeline():
         else:
             node_with_scores_path = []
         node_with_scores = HybridRetriever.fusion([
-            node_with_scores,
+            node_with_scores_rewrite,
             node_with_scores_path,
         ])
         
