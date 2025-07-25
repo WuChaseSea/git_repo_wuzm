@@ -163,3 +163,6 @@ top6 0.4356 top10 0.4311
 * 5 在2的基础上将default改成了适合dense的参数，0.4578，result_bge_m3_vector8_fusai_rewritequery_dense
 * 6 在5的基础上将dense重新修改成了default，0.4844，result_bge_m3_vector8_fusai_rewritequery_default
 * 7 使用多视觉生成的方式，0.4444，result_bge_m3_vector8_fusai_multiview
+* 8 在3的基础上更换rerank模型，使用普通的rerank，0.4533 result_bge_m3_vector8_fusai_rerank_st
+* 9 在2的基础上增添了一个判断，如果score大的话才使用重写后的召回内容，0.5022 result_bge_m3_vector8_fusai_0
+* 10 在9的基础上更换embedding模型为qwen3-embeddings-0.6b，0.4207，result_bge_m3_vector8_fusai_qwen·

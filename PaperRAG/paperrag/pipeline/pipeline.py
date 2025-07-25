@@ -14,10 +14,62 @@ import asyncio, nest_asyncio
 from qwen_agent.llm import get_chat_model
 
 from llama_index.core import Settings, PromptTemplate, QueryBundle
-from langchain_community.embeddings import HuggingFaceBgeEmbeddings
+from langchain_community.embeddings import HuggingFaceBgeEmbeddings, SentenceTransformerEmbeddings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.embeddings.langchain import LangchainEmbedding
 from qdrant_client import models
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.schema import IndexNode
+from llama_index.core import VectorStoreIndex
+from llama_index.core.retrievers import RecursiveRetriever
+from sentence_transformers import SentenceTransformer
+import sentence_transformers
+
+class SentenceTransformerMy(object):
+    
+    encode_kwargs = dict()
+    # See also the Sentence Transformer documentation: https://sbert.net/docs/package_reference/SentenceTransformer.html#sentence_transformers.SentenceTransformer.encode"""
+    multi_process: bool = False
+    """Run encode() on multiple GPUs."""
+    show_progress: bool = False
+    """Whether to show a progress bar."""
+    
+    def __init__(self, model_path, **kwargs):
+        self.client = SentenceTransformer(model_path, **kwargs)
+    
+    def embed_documents(self, texts):
+            """Compute doc embeddings using a HuggingFace transformer model.
+
+            Args:
+                texts: The list of texts to embed.
+
+            Returns:
+                List of embeddings, one for each text.
+            """
+
+            texts = list(map(lambda x: x.replace("\n", " "), texts))
+            if self.multi_process:
+                pool = self.client.start_multi_process_pool()
+                embeddings = self.client.encode_multi_process(texts, pool)
+                sentence_transformers.SentenceTransformer.stop_multi_process_pool(pool)
+            else:
+                embeddings = self.client.encode(
+                    texts, show_progress_bar=self.show_progress, **self.encode_kwargs
+                )
+
+            return embeddings.tolist()
+        
+    def embed_query(self, text: str):
+        """Compute query embeddings using a HuggingFace transformer model.
+
+        Args:
+            text: The text to embed.
+
+        Returns:
+            Embeddings for the text.
+        """
+        return self.embed_documents([text])[0]
+
 
 from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, QA_TEMPLATE_EN, QA_TEMPLATE_0, QA_TEMPLATE_1, QA_TEMPLATE_2, QA_TEMPLATE_3, QA_TEMPLATE_4, QA_TEMPLATE_5
 from ..custom.retrievers import QdrantRetriever, HybridRetriever, BM25Retriever
@@ -61,16 +113,18 @@ class PaperRAGPipeline():
 
         self.qa_template = self.build_prompt_template(QA_TEMPLATE)
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
-
+        
         model_name = config["embedding_name"]
-        model_kwargs = {'device': 'cpu'}
-        encode_kwargs = {'normalize_embeddings': False}
-        bge_embeddings = HuggingFaceBgeEmbeddings(
-            model_name=model_name,
-            model_kwargs=model_kwargs,
-            encode_kwargs=encode_kwargs
-        )
-        embedding = LangchainEmbedding(bge_embeddings)
+        embedding = SentenceTransformerMy(model_name)
+        # import ipdb;ipdb.set_trace()
+        # model_kwargs = {'device': 'cpu'}
+        # encode_kwargs = {'normalize_embeddings': False}
+        # bge_embeddings = HuggingFaceBgeEmbeddings(
+        #     model_name=model_name,
+        #     model_kwargs=model_kwargs,
+        #     encode_kwargs=encode_kwargs
+        # )
+        embedding = LangchainEmbedding(embedding)
         Settings.embed_model = embedding
         print(f"Embddding 创建完成.")
 
@@ -135,6 +189,33 @@ class PaperRAGPipeline():
         import jieba
         self.sparse_tk = jieba.Tokenizer()
         self.nodes = nodes
+
+        # sub_chunk_sizes = [64, 128, 256]
+        # sub_node_parsers = [
+        #     SentenceSplitter(chunk_size=c, chunk_overlap=20) for c in sub_chunk_sizes
+        # ]
+
+        # all_nodes = []
+        # for base_node in self.nodes:
+        #     for n in sub_node_parsers:
+        #         sub_nodes = n.get_nodes_from_documents([base_node])
+        #         sub_inodes = [
+        #             IndexNode.from_text_node(sn, base_node.node_id) for sn in sub_nodes
+        #         ]
+        #         all_nodes.extend(sub_inodes)
+
+        #     # also add original node to node
+        #     original_node = IndexNode.from_text_node(base_node, base_node.node_id)
+        #     all_nodes.append(original_node)
+        # all_nodes_dict = {n.node_id: n for n in all_nodes}
+        # vector_index_chunk = VectorStoreIndex(all_nodes, embed_model=bge_embeddings)
+        # vector_retriever_chunk = vector_index_chunk.as_retriever(similarity_top_k=2*f_topk_1)
+        # self.retriever_chunk = RecursiveRetriever(
+        #     "vector",
+        #     retriever_dict={"vector": vector_retriever_chunk},
+        #     node_dict=all_nodes_dict,
+        #     verbose=True,
+        # )
         
         f_topk_2 = config['f_topk_2']
         f_embed_type_2 = config['f_embed_type_2']
@@ -333,6 +414,9 @@ class PaperRAGPipeline():
             node_with_scores_rewrite = self.dense_retriever.retrieve(query_bundle_rewrite)
             node_scores = [i.score for i in node_with_scores]
             node_scores_write = [i.score for i in node_with_scores_rewrite]
+            origin = False
+            if node_scores_write[0] < node_scores[0]:
+                origin = True
             print(f"origin score: {node_scores}")
             print(f"rewrite score: {node_scores_write}")
         elif self.retrieval_type == 2:
@@ -343,10 +427,16 @@ class PaperRAGPipeline():
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:
             node_with_scores_path = []
-        node_with_scores = HybridRetriever.fusion([
-            node_with_scores_rewrite,
-            node_with_scores_path,
-        ])
+        if origin:
+            node_with_scores = HybridRetriever.fusion([
+                node_with_scores,
+                node_with_scores_path,
+            ])
+        else:
+            node_with_scores = HybridRetriever.fusion([
+                node_with_scores_rewrite,
+                node_with_scores_path,
+            ])
         
         if self.reranker:
             node_with_scores = self.reranker.postprocess_nodes(node_with_scores, query_bundle)
