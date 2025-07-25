@@ -25,7 +25,7 @@ from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
 from .ingestion import get_node_content as _get_node_content
 from .rag import generation as _generation
-from ..utils.rewrite_query import rewrite_query
+from ..utils.rewrite_query import rewrite_query, generate_multi_perspective_queries
 
 nest_asyncio.apply()
 
@@ -247,6 +247,16 @@ class PaperRAGPipeline():
         answer_b = query_str.split('A.')[1].split('B.')[1].split('C.')[0].strip()
         answer_c = query_str.split('A.')[1].split('B.')[1].split('C.')[1].split('D.')[0].strip()
         answer_d = query_str.split('D.')[1].strip()
+
+        # qa_list = [
+        #     {
+        #         "question": question_str,
+        #         "options": ['A. '+answer_a, 'B. '+answer_b, 'C. '+answer_c, 'D. '+answer_d]
+        #     }
+        # ]
+        # output = generate_multi_perspective_queries(qa_list)[0]
+        # rewrite_result = output["multi_view_query"]
+
         options = [answer_a, answer_b, answer_c, answer_d]
         rewrite_result = rewrite_query(question_str, options, mode="default")
         return rewrite_result
@@ -334,8 +344,8 @@ class PaperRAGPipeline():
         else:
             node_with_scores_path = []
         node_with_scores = HybridRetriever.fusion([
-            node_with_scores,
             node_with_scores_rewrite,
+            node_with_scores_path,
         ])
         
         if self.reranker:

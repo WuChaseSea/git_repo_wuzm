@@ -160,3 +160,6 @@ top6 0.4356 top10 0.4311
 * 2 查询改写之后score确实提高了，但是分数下降，使用改写查询，但是LLM的问题仍使用改写之前的，0.4844 result_bge_m3_vector8_fusai_rewritequery_1
 * 3 在上一个的基础上对两者的查询结果进行合并，然后使用bge llm rerank， 0.4622 result_bge_m3_vector8_fusai_rewritequery_rerank
 * 4 在2的基础上直接合并两者的查询，0.4667 result_bge_m3_vector8_fusai_rewritequery_norerank
+* 5 在2的基础上将default改成了适合dense的参数，0.4578，result_bge_m3_vector8_fusai_rewritequery_dense
+* 6 在5的基础上将dense重新修改成了default，0.4844，result_bge_m3_vector8_fusai_rewritequery_default
+* 7 使用多视觉生成的方式，0.4444，result_bge_m3_vector8_fusai_multiview

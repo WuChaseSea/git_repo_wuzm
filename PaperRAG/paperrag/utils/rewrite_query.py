@@ -48,3 +48,69 @@ def rewrite_query(question: str, options: list[str], mode: str = "default") -> s
         raise ValueError(f"Unknown rewrite mode: {mode}")
 
     return rewritten
+
+import random
+
+def generate_multi_perspective_queries(qa_list):
+    """
+    给定一个包含问题和选项的列表，自动生成更有利于向量检索的多视角拼接查询语句。
+    
+    参数：
+        qa_list: List[Dict]，每个元素形如：
+            {
+                "question": "原始问题字符串",
+                "options": ["A. 选项1", "B. 选项2", ...]
+            }
+
+    返回：
+        List[Dict]，每个元素形如：
+            {
+                "original_question": "...",
+                "multi_view_query": "拼接后的查询"
+            }
+    """
+
+    # 多视角引导语句模板
+    perspectives = [
+        "Based on the experimental results discussed in the paper,",
+        "Considering the evaluation section of the study,",
+        "From the methodology and reported findings,",
+        "According to the performance metrics highlighted by the authors,",
+        "In the context of the reported evaluation on benchmark datasets,"
+    ]
+
+    # 查询重构模板
+    reform_templates = [
+        "does the paper mention metrics such as {opt}?",
+        "which of the following metrics are explicitly reported: {opt}?",
+        "are metrics like {opt} used to assess the model's performance?",
+        "is there any mention of evaluation metrics including {opt}?",
+        "does the analysis involve metrics like {opt}?"
+    ]
+
+    output = []
+
+    for qa in qa_list:
+        question = qa['question'].strip()
+        
+        # 去除选项中的"A. "等前缀，仅保留选项文本
+        raw_options = [opt.split('. ', 1)[-1] for opt in qa['options']]
+        options_str = ', '.join(raw_options)
+
+        # 随机选择视角与改写方式
+        perspective = random.choice(perspectives)
+        reformulation = random.choice(reform_templates).format(opt=options_str)
+
+        # 构建完整的多视角查询
+        multi_view_query = (
+            f"{question} {perspective} {reformulation} "
+            f"How does the paper evaluate the proposed method?"
+        )
+
+        output.append({
+            "original_question": question,
+            "multi_view_query": multi_view_query
+        })
+
+    return output
+

@@ -72,12 +72,12 @@ async def main(
     nodes_list, scores_list, answer_list = [], [], []
     all_rows = []
     for num, query in enumerate(tqdm(queries, total=len(queries))):
-        if num < 225:
-            save_one_json = save_folder / f"{num}.json"
-            with open(save_one_json, encoding="utf-8") as f:
-                answer = json.loads(f.read())
-            results[num]["correct_answer"] = answer['correct_answer']
-            continue
+        # if num < 225:
+        #     save_one_json = save_folder / f"{num}.json"
+        #     with open(save_one_json, encoding="utf-8") as f:
+        #         answer = json.loads(f.read())
+        #     results[num]["correct_answer"] = answer['correct_answer']
+        #     continue
         
         res = await rag_pipeline.run(query)
         # res = await rag_pipeline.process_quesiton(query)
