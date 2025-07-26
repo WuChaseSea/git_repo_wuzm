@@ -165,4 +165,7 @@ top6 0.4356 top10 0.4311
 * 7 使用多视觉生成的方式，0.4444，result_bge_m3_vector8_fusai_multiview
 * 8 在3的基础上更换rerank模型，使用普通的rerank，0.4533 result_bge_m3_vector8_fusai_rerank_st
 * 9 在2的基础上增添了一个判断，如果score大的话才使用重写后的召回内容，0.5022 result_bge_m3_vector8_fusai_0
-* 10 在9的基础上更换embedding模型为qwen3-embeddings-0.6b，0.4207，result_bge_m3_vector8_fusai_qwen·
+* 10 在9的基础上更换embedding模型为qwen3-embeddings-0.6b，0.4207，result_bge_m3_vector8_fusai_qwen
+* 11 在9的基础上更换为了hybrid检索，0.4544，result_bge_m3_vector8_fusai_hybrid
+* 12 在9的基础上将根据第0个元素判断更改为根据均值判断，0.5022，result_bge_m3_vector8_fusai_dense_mean
+* 13 在12的基础上进一步对改写进行细分，分为了实验，评估等部分，0.4933，result_bge_m3_vector8_fusai_dense_rewrite

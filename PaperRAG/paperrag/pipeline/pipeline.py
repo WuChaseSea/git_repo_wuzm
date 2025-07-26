@@ -7,6 +7,7 @@
 '''
 import os, sys
 import re
+import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 import pickle
@@ -115,16 +116,16 @@ class PaperRAGPipeline():
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
         
         model_name = config["embedding_name"]
-        embedding = SentenceTransformerMy(model_name)
+        # embedding = SentenceTransformerMy(model_name)
         # import ipdb;ipdb.set_trace()
-        # model_kwargs = {'device': 'cpu'}
-        # encode_kwargs = {'normalize_embeddings': False}
-        # bge_embeddings = HuggingFaceBgeEmbeddings(
-        #     model_name=model_name,
-        #     model_kwargs=model_kwargs,
-        #     encode_kwargs=encode_kwargs
-        # )
-        embedding = LangchainEmbedding(embedding)
+        model_kwargs = {'device': 'cpu'}
+        encode_kwargs = {'normalize_embeddings': False}
+        bge_embeddings = HuggingFaceBgeEmbeddings(
+            model_name=model_name,
+            model_kwargs=model_kwargs,
+            encode_kwargs=encode_kwargs
+        )
+        embedding = LangchainEmbedding(bge_embeddings)
         Settings.embed_model = embedding
         print(f"Embddding 创建完成.")
 
@@ -415,7 +416,8 @@ class PaperRAGPipeline():
             node_scores = [i.score for i in node_with_scores]
             node_scores_write = [i.score for i in node_with_scores_rewrite]
             origin = False
-            if node_scores_write[0] < node_scores[0]:
+            if np.mean(node_scores_write) < np.mean(node_scores):
+            # if node_scores_write[0] < node_scores[0]:
                 origin = True
             print(f"origin score: {node_scores}")
             print(f"rewrite score: {node_scores_write}")
@@ -423,6 +425,14 @@ class PaperRAGPipeline():
             node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         else:
             node_with_scores = await self.retriever.aretrieve(query_bundle)
+            node_with_scores_rewrite = await self.retriever.aretrieve(query_bundle_rewrite)
+            node_scores = [i.score for i in node_with_scores]
+            node_scores_write = [i.score for i in node_with_scores_rewrite]
+            origin = False
+            if node_scores_write[0] < node_scores[0]:
+                origin = True
+            print(f"origin score: {node_scores}")
+            print(f"rewrite score: {node_scores_write}")
         if self.path_retriever is not None:
             node_with_scores_path = await self.path_retriever.aretrieve(query_bundle)
         else:

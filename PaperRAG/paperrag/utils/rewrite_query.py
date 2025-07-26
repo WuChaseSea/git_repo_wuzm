@@ -7,6 +7,22 @@ def format_options(option_list):
         formatted.append(f"{label}. {opt.strip()}")
     return "\n".join(formatted)
 
+def guess_question_type(question: str) -> str:
+    """
+    Try to guess the type of the question for better template selection.
+    """
+    q = question.lower()
+    if "metric" in q or "score" in q or "accuracy" in q:
+        return "evaluation"
+    elif "component" in q or "module" in q or "architecture" in q:
+        return "component"
+    elif "ablation" in q or "improvement" in q or "effect" in q:
+        return "ablation"
+    elif "experiment" in q:
+        return "experiment"
+    return "general"
+
+
 def rewrite_query(question: str, options: list[str], mode: str = "default") -> str:
     """
     Automatically rewrites a multiple-choice QA query to improve semantic embedding.
@@ -18,6 +34,43 @@ def rewrite_query(question: str, options: list[str], mode: str = "default") -> s
     """
 
     formatted_options = format_options(options)
+    qtype = guess_question_type(question)
+
+    # Default version
+    default_view = (
+        f"The following question concerns technical details discussed in an academic paper. "
+        f"Determine which of the following statements are supported by the paper's content.\n\n"
+        f"Question:\n{question.strip()}\n\n"
+        f"Options:\n{formatted_options}\n\n"
+        f"The answer depends on evidence found in the paper, including methodology, results, and discussions."
+    )
+
+
+    # Specialized version based on question type
+    if qtype == "evaluation":
+        type_view = (
+            f"Identify which of the following metrics or criteria were used to evaluate the proposed method in the paper.\n\n"
+            f"Question:\n{question.strip()}\n\n"
+            f"Options:\n{formatted_options}\n\n"
+            f"Focus on the experimental section or result tables."
+        )
+    elif qtype == "component":
+        type_view = (
+            f"Determine which components or modules are explicitly mentioned as part of the proposed system.\n\n"
+            f"Question:\n{question.strip()}\n\n"
+            f"Options:\n{formatted_options}\n\n"
+            f"Focus on architecture descriptions and methodology sections."
+        )
+    elif qtype == "ablation":
+        type_view = (
+            f"Based on the ablation studies in the paper, identify which of the following statements are supported.\n\n"
+            f"Question:\n{question.strip()}\n\n"
+            f"Options:\n{formatted_options}\n\n"
+            f"Look into ablation study results and related performance changes."
+        )
+    else:
+        type_view = default_view  # fallback
+
 
     if mode == "default":
         rewritten = (
