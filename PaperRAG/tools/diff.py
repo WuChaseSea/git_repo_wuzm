@@ -8,8 +8,10 @@
 import json
 
 if __name__ == "__main__":
-    json_path1 = "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/结果/result_bge_m3_vec_top8_multi/base_version.json"
-    json_path2 = "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/结果/result_bge_m3_vector_template/base_version.json"
+    # json_path1 = "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/结果/result_bge_m3_vec_top8_multi/base_version.json"
+    # json_path2 = "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG/结果/result_bge_m3_vector_template/base_version.json"
+    json_path1 = "E:/Dataset/TIANCHIPaperRAG/result_bge_m3_vector8_fusai_0/base_version.json"
+    json_path2 = "E:/Dataset/TIANCHIPaperRAG/result_bge_m3_vector8_fusai_dense_mean/base_version.json"
     with open(json_path1, encoding="utf-8") as f:
         infos1 = json.loads(f.read())
     with open(json_path2, encoding="utf-8") as f:
