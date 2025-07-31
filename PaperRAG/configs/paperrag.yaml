@@ -1,6 +1,6 @@
-# work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
-work_dir: "E:/Dataset/TIANCHIPaperRAG"
-result_dir: "result_bge_m3_vector8_fusai_dense_rewrite"
+work_dir: "/Volumes/wuzhaoming/Dataset/TIANCHIPaperRAG"
+# work_dir: "E:/Dataset/TIANCHIPaperRAG"
+result_dir: "result_bge_m3_vector8_fusai_dense_hyde_if"
 
 # 大语言模型参数
 llm_name: "qwen-plus-2025-01-25"
@@ -17,8 +17,8 @@ chunk_overlap: 50
 # 密集检索器参数
 qdrant_url: "http://localhost:6333"
 reindex: false
-# embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
-embedding_name: "E:/Models/embedding/bge-m3"
+embedding_name: "/Users/wuzm/Documents/CodeRepository/Models/embedding_models/bge-m3"
+# embedding_name: "E:/Models/embedding/bge-m3"
 # embedding_name: "/Volumes/wuzhaoming/Models/embedding/Qwen3-Embedding-0.6B"
 vector_size: 1024
 cache_path: "cache_bge_m3_300_doclingpdf_rebuild"

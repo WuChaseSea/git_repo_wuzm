@@ -72,7 +72,7 @@ class SentenceTransformerMy(object):
         return self.embed_documents([text])[0]
 
 
-from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, QA_TEMPLATE_EN, QA_TEMPLATE_0, QA_TEMPLATE_1, QA_TEMPLATE_2, QA_TEMPLATE_3, QA_TEMPLATE_4, QA_TEMPLATE_5
+from ..custom.template import QA_TEMPLATE, MERGE_TEMPLATE, HyDE_TEMPLATE, QA_TEMPLATE_EN, QA_TEMPLATE_0, QA_TEMPLATE_1, QA_TEMPLATE_2, QA_TEMPLATE_3, QA_TEMPLATE_4, QA_TEMPLATE_5
 from ..custom.retrievers import QdrantRetriever, HybridRetriever, BM25Retriever
 from ..custom.rerankers import SentenceTransformerRerank, LLMRerank
 from .ingestion import read_data, build_vector_store, build_pipeline, build_qdrant_filters
@@ -114,6 +114,7 @@ class PaperRAGPipeline():
 
         self.qa_template = self.build_prompt_template(QA_TEMPLATE)
         self.merge_template = self.build_prompt_template(MERGE_TEMPLATE)
+        self.hyde_template = self.build_prompt_template(HyDE_TEMPLATE)
         
         model_name = config["embedding_name"]
         # embedding = SentenceTransformerMy(model_name)
@@ -410,17 +411,27 @@ class PaperRAGPipeline():
         query_bundle = self.build_query_bundle(query_str + hyde_query)
         # node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         query_bundle_rewrite = self.build_query_bundle(self.rewrite_query(query_str) + hyde_query)
+        hyde_prompt = self.hyde_template.format(
+            question=query_str
+        )
+        ret_hyde = await self.generation(self.llm, hyde_prompt)
+        query_bundle_hyde = self.build_query_bundle(ret_hyde)
         if self.retrieval_type == 1:
             node_with_scores = self.dense_retriever.retrieve(query_bundle)
             node_with_scores_rewrite = self.dense_retriever.retrieve(query_bundle_rewrite)
+            node_with_scores_hyde = self.dense_retriever.retrieve(query_bundle_hyde)
+            # node_with_scores = [i for i in node_with_scores if i.score > 0.65]
+            # node_with_scores_rewrite = [i for i in node_with_scores_rewrite if i.score > 0.65]
             node_scores = [i.score for i in node_with_scores]
             node_scores_write = [i.score for i in node_with_scores_rewrite]
+            node_scores_hyde = [i.score for i in node_with_scores_hyde]
             origin = False
             if np.mean(node_scores_write) < np.mean(node_scores):
             # if node_scores_write[0] < node_scores[0]:
                 origin = True
             print(f"origin score: {node_scores}")
             print(f"rewrite score: {node_scores_write}")
+            print(f"hyde score: {node_scores_hyde}")
         elif self.retrieval_type == 2:
             node_with_scores = await self.sparse_retriever.aretrieve(query_bundle)
         else:
@@ -440,12 +451,12 @@ class PaperRAGPipeline():
         if origin:
             node_with_scores = HybridRetriever.fusion([
                 node_with_scores,
-                node_with_scores_path,
+                node_with_scores_hyde,
             ])
         else:
             node_with_scores = HybridRetriever.fusion([
                 node_with_scores_rewrite,
-                node_with_scores_path,
+                node_with_scores_hyde,
             ])
         
         if self.reranker:

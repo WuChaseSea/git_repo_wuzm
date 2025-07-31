@@ -169,3 +169,6 @@ top6 0.4356 top10 0.4311
 * 11 在9的基础上更换为了hybrid检索，0.4544，result_bge_m3_vector8_fusai_hybrid
 * 12 在9的基础上将根据第0个元素判断更改为根据均值判断，0.5022，result_bge_m3_vector8_fusai_dense_mean
 * 13 在12的基础上进一步对改写进行细分，分为了实验，评估等部分，0.4933，result_bge_m3_vector8_fusai_dense_rewrite
+* 14 在12的基础上，只使用评分在0.65以上的查询结果，0.4578，result_bge_m3_vector8_fusai_dense_065
+* 15 在9的基础上，添加了hyde，使用hyde召回的内容进行LLM，0.4489，result_bge_m3_vector8_fusai_dense_hyde
+* 16 在15的基础上，增添了判断语句，哪个高用哪个召回的内容，0.4578，result_bge_m3_vector8_fusai_dense_hyde_if

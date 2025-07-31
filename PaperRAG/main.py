@@ -80,7 +80,6 @@ async def main(
         #     continue
         
         res = await rag_pipeline.run(query)
-        import ipdb;ipdb.set_trace()
         # res = await rag_pipeline.process_quesiton(query)
         answer = res["answer"]
         
