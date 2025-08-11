@@ -1,4 +1,5 @@
 import gradio as gr
+from pathlib import Path
 
 from apps.base import BasePage
 from apps.pages.chat.control import ConversationControl
@@ -12,7 +13,9 @@ from models.indices.ingests.files import VP_DEFAULT_FILE_EXTRACTORS
 class ChatPage(BasePage):
     def __init__(self, app):
         self._app = app
+        self._indices_input = []
         self.on_building_ui()
+        self._indices_input.append(0)
     
     def on_building_ui(self):
         with gr.Row():
@@ -23,14 +26,20 @@ class ChatPage(BasePage):
 
                 quick_upload_label = ("Quick Upload")
                 with gr.Accordion(label=quick_upload_label) as _:
-                    self.quick_file_upload_status = gr.Markdown()
-                    self.quick_file_upload = File(
+                    self.quick_file_upload_status = gr.Markdown("none")
+                    self.quick_file_upload = gr.File(
                             file_types=list(VP_DEFAULT_FILE_EXTRACTORS.keys()),
                             file_count="multiple",
                             container=True,
                             show_label=False,
                             elem_id="quick-file",
                         )
+                    def on_upload(files):
+                        print("Upload called:", files)
+                        return "Uploading..."
+                    status = gr.Textbox(label="Status")
+                    self.quick_file_upload.upload(fn=on_upload, outputs=status)
+                    
                     self.quick_urls = gr.Textbox(
                         placeholder=(
                             "Or paste URLs"
@@ -58,3 +67,56 @@ class ChatPage(BasePage):
             
         self.followup_questions = self.chat_suggestion.examples
         self.followup_questions_ui = self.chat_suggestion.accordion
+
+    
+    def on_upload(self, files):
+        print("Upload called:", files)
+        return "Uploading..."
+    
+    def on_register_quick_uploads(self):
+        print(f"begin register quick uploads")
+        quickUploadedEvent = self._app.chat_page.quick_file_upload.upload(
+            fn=self.on_upload,
+            outputs=self._app.chat_page.quick_file_upload_status,
+        )
+        quickUploadedEvent.then(
+            fn=self.index_fn_file_with_default_loaders,
+            inputs=[
+                self.quick_file_upload,
+                gr.State(value=False)
+            ],
+            outputs=self.quick_file_upload_status,
+            concurrency_limit=10,
+        )
+        quickUploadedEvent.success(
+            fn=lambda: gr.update(
+                value="Please wait for the indexing process to complete before adding your question."
+            ),
+            outputs=self.quick_file_upload_status,
+        )
+        self.quickUploadedEvent = quickUploadedEvent  # 保持引用
+        return quickUploadedEvent
+
+    
+    def fake_index(self, file):
+        import time
+        time.sleep(10)  # 模拟3秒的处理
+        return
+    
+    def on_register_events(self):
+        print(f"register events...")
+        self.on_register_quick_uploads()
+    
+    def index_fn_file_with_default_loaders(
+        self, files, reindex: bool
+    ) -> list["str"]:
+        """Function for quick upload with default loaders
+
+        Args:
+            files: the list of files to be uploaded
+            reindex: whether to reindex the files
+            selected_files: the list of files already selected
+            settings: the settings of the app
+        """
+        print("Overriding with default loaders")
+        import ipdb;ipdb.set_trace()

@@ -152,6 +152,13 @@ class BaseApp:
 
     def register_events(self):
         """Register all events"""
+        self.on_register_events()
+        for value in self.__dict__.values():
+            if isinstance(value, BasePage):
+                # from apps.pages.chat.chat_pages import ChatPage
+                # if isinstance(value, ChatPage):
+                #     import ipdb;ipdb.set_trace()
+                value.register_events()
 
     def on_app_created(self):
         """Execute on app created callbacks"""
@@ -209,6 +216,10 @@ class BasePage:
 
     def register_events(self):
         """Register all events"""
+        self.on_register_events()
+        # for value in self.__dict__.values():
+        #     if isinstance(value, BasePage):
+        #         value.register_events()
 
     def on_app_created(self):
         """Execute on app created callbacks"""
