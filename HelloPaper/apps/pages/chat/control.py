@@ -1,10 +1,10 @@
 import gradio as gr
 
-from apps.base import BasePage
+# from apps.base import BasePage
 
 ASSETS_DIR = "apps/assets/icons"
 
-class ConversationControl(BasePage):
+class ConversationControl():
     def __init__(self, app):
         self._app = app
 

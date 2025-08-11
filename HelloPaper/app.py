@@ -23,3 +23,4 @@ demo.queue().launch(
     ],
     share=VP_GRADIO_SHARE,
 )
+# demo.launch()

@@ -128,27 +128,19 @@ class BaseApp:
             css=self._css,
             title=self.app_name,
             analytics_enabled=False,
-            js=self._js,
+            # js=self._js,
             head=external_js,
         ) as demo:
             self.app = demo
 
             self.ui()
 
-            self.declare_public_events()
-            self.subscribe_public_events()
             self.register_events()
-            self.on_app_created()
 
             demo.load(None, None, None, js=self._pdf_view_js)
 
         return demo
     
-    def declare_public_events(self):
-        """Declare an event for the app"""
-
-    def subscribe_public_events(self):
-        """Subscribe to an event"""
 
     def register_events(self):
         """Register all events"""
@@ -159,10 +151,6 @@ class BaseApp:
                 # if isinstance(value, ChatPage):
                 #     import ipdb;ipdb.set_trace()
                 value.register_events()
-
-    def on_app_created(self):
-        """Execute on app created callbacks"""
-        self._on_app_created()
 
 
 class BasePage:

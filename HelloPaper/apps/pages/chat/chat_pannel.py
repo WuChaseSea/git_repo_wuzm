@@ -1,5 +1,5 @@
 import gradio as gr
-from apps.base import BasePage
+# from apps.base import BasePage
 
 
 PLACEHOLDER_TEXT = (
@@ -9,7 +9,7 @@ PLACEHOLDER_TEXT = (
 )
 
 
-class ChatPanel(BasePage):
+class ChatPanel():
     def __init__(self, app):
         self._app = app
         self.on_building_ui()

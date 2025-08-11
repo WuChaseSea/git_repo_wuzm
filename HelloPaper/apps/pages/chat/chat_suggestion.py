@@ -1,8 +1,8 @@
 import gradio as gr
 
-from apps.base import BasePage
+# from apps.base import BasePage
 
-class ChatSuggestion(BasePage):
+class ChatSuggestion():
     CHAT_SAMPLES = [
             "Summary this document",
             "Generate a FAQ for this document",

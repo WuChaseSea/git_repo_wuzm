@@ -14,8 +14,9 @@ class ChatPage(BasePage):
     def __init__(self, app):
         self._app = app
         self._indices_input = []
-        self.on_building_ui()
         self._indices_input.append(0)
+        self.on_building_ui()
+        self.register_already = False
     
     def on_building_ui(self):
         with gr.Row():
@@ -34,11 +35,6 @@ class ChatPage(BasePage):
                             show_label=False,
                             elem_id="quick-file",
                         )
-                    def on_upload(files):
-                        print("Upload called:", files)
-                        return "Uploading..."
-                    status = gr.Textbox(label="Status")
-                    self.quick_file_upload.upload(fn=on_upload, outputs=status)
                     
                     self.quick_urls = gr.Textbox(
                         placeholder=(
@@ -74,34 +70,33 @@ class ChatPage(BasePage):
         return "Uploading..."
     
     def on_register_quick_uploads(self):
-        print(f"begin register quick uploads")
-        quickUploadedEvent = self._app.chat_page.quick_file_upload.upload(
-            fn=self.on_upload,
-            outputs=self._app.chat_page.quick_file_upload_status,
-        )
-        quickUploadedEvent.then(
-            fn=self.index_fn_file_with_default_loaders,
-            inputs=[
-                self.quick_file_upload,
-                gr.State(value=False)
-            ],
-            outputs=self.quick_file_upload_status,
-            concurrency_limit=10,
-        )
-        quickUploadedEvent.success(
-            fn=lambda: gr.update(
-                value="Please wait for the indexing process to complete before adding your question."
-            ),
-            outputs=self.quick_file_upload_status,
-        )
-        self.quickUploadedEvent = quickUploadedEvent  # 保持引用
-        return quickUploadedEvent
-
-    
-    def fake_index(self, file):
-        import time
-        time.sleep(10)  # 模拟3秒的处理
-        return
+        if not self.register_already:
+            print(f"begin register quick uploads")
+            quickUploadedEvent = self._app.chat_page.quick_file_upload.upload(
+                fn=lambda: gr.update(
+                    value="Please wait for the indexing process "
+                    "to complete before adding your question."
+                ),
+                outputs=self._app.chat_page.quick_file_upload_status,
+            )
+            quickUploadedEvent.then(
+                fn=self.index_fn_file_with_default_loaders,
+                inputs=[
+                    self.quick_file_upload,
+                    gr.State(value=False)
+                ],
+                outputs=self.quick_file_upload_status,
+                concurrency_limit=10,
+            )
+            quickUploadedEvent.success(
+                fn=lambda: gr.update(
+                    value="Please wait for the indexing process to complete before adding your question."
+                ),
+                outputs=self.quick_file_upload_status,
+            )
+            self.quickUploadedEvent = quickUploadedEvent  # 保持引用
+            self.register_already = True
+            return quickUploadedEvent
     
     def on_register_events(self):
         print(f"register events...")
