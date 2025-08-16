@@ -25,4 +25,6 @@ VP_APP_DATA_DIR = this_dir / "viewpaper_app_data"
 VP_APP_DATA_EXISTS = VP_APP_DATA_DIR.exists()
 VP_APP_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
+EMBEDDING_MODEL = "E:/Models/embedding/bge-m3"
+EMBEDDING_VECTOR_SIZE = 1024
 
