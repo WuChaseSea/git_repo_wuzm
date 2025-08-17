@@ -16,7 +16,7 @@ class ChatSuggestion():
         self.chat_samples = [[each] for each in self.CHAT_SAMPLES]
         with gr.Accordion(
             label="Chat Suggestion",
-            visible=True,
+            visible=False,
         ) as self.accordion:
             self.default_example = gr.State(
                 value=self.chat_samples,
@@ -28,3 +28,6 @@ class ChatSuggestion():
                 elem_id="chat-suggestion",
                 wrap=True,
             )
+    
+    def select_example(self, ev: gr.SelectData):
+        return {"text": ev.value}

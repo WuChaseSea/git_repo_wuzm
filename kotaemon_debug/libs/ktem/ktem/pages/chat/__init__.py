@@ -482,29 +482,29 @@ class ChatPage(BasePage):
                 outputs=[self._preview_links],
                 js=pdfview_js,
             )
-            .success(
-                fn=self.check_and_suggest_name_conv,
-                inputs=self.chat_panel.chatbot,
-                outputs=[
-                    self.chat_control.conversation_rn,
-                    self._conversation_renamed,
-                ],
-            )
-            .success(
-                self.chat_control.rename_conv,
-                inputs=[
-                    self.chat_control.conversation_id,
-                    self.chat_control.conversation_rn,
-                    self._conversation_renamed,
-                    self._app.user_id,
-                ],
-                outputs=[
-                    self.chat_control.conversation,
-                    self.chat_control.conversation,
-                    self.chat_control.conversation_rn,
-                ],
-                show_progress="hidden",
-            )
+            # .success(
+            #     fn=self.check_and_suggest_name_conv,
+            #     inputs=self.chat_panel.chatbot,
+            #     outputs=[
+            #         self.chat_control.conversation_rn,
+            #         self._conversation_renamed,
+            #     ],
+            # )
+            # .success(
+            #     self.chat_control.rename_conv,
+            #     inputs=[
+            #         self.chat_control.conversation_id,
+            #         self.chat_control.conversation_rn,
+            #         self._conversation_renamed,
+            #         self._app.user_id,
+            #     ],
+            #     outputs=[
+            #         self.chat_control.conversation,
+            #         self.chat_control.conversation,
+            #         self.chat_control.conversation_rn,
+            #     ],
+            #     show_progress="hidden",
+            # )
         )
 
         onSuggestChatEvent = {
@@ -522,29 +522,29 @@ class ChatPage(BasePage):
             "show_progress": "hidden",
         }
         # chat suggestion toggle
-        chat_event = chat_event.success(**onSuggestChatEvent)
+        # chat_event = chat_event.success(**onSuggestChatEvent)
 
-        # final data persist
-        if not KH_DEMO_MODE:
-            chat_event = chat_event.then(
-                fn=self.persist_data_source,
-                inputs=[
-                    self.chat_control.conversation_id,
-                    self._app.user_id,
-                    self.info_panel,
-                    self.state_plot_panel,
-                    self.state_retrieval_history,
-                    self.state_plot_history,
-                    self.chat_panel.chatbot,
-                    self.state_chat,
-                ]
-                + self._indices_input,
-                outputs=[
-                    self.state_retrieval_history,
-                    self.state_plot_history,
-                ],
-                concurrency_limit=20,
-            )
+        # # final data persist
+        # if not KH_DEMO_MODE:
+        #     chat_event = chat_event.then(
+        #         fn=self.persist_data_source,
+        #         inputs=[
+        #             self.chat_control.conversation_id,
+        #             self._app.user_id,
+        #             self.info_panel,
+        #             self.state_plot_panel,
+        #             self.state_retrieval_history,
+        #             self.state_plot_history,
+        #             self.chat_panel.chatbot,
+        #             self.state_chat,
+        #         ]
+        #         + self._indices_input,
+        #         outputs=[
+        #             self.state_retrieval_history,
+        #             self.state_plot_history,
+        #         ],
+        #         concurrency_limit=20,
+        #     )
 
         self.chat_control.btn_info_expand.click(
             fn=lambda is_expanded: (
@@ -1281,7 +1281,6 @@ class ChatPage(BasePage):
         """Chat function"""
         chat_input, chat_output = chat_history[-1]
         chat_history = chat_history[:-1]
-
         # if chat_input is empty, assume regen mode
         if chat_output:
             chat_state["app"]["regen"] = True
@@ -1336,6 +1335,8 @@ class ChatPage(BasePage):
                     if response.content is None:
                         refs = ""
                     else:
+                        # if "[Export]" in response.content:
+                        #     import ipdb;ipdb.set_trace()
                         refs += response.content
 
                 if response.channel == "plot":
@@ -1343,7 +1344,6 @@ class ChatPage(BasePage):
                     plot_gr = self._json_to_plot(plot)
 
                 chat_state[pipeline.get_info()["id"]] = reasoning_state["pipeline"]
-
                 yield (
                     chat_history + [(chat_input, text or msg_placeholder)],
                     refs,

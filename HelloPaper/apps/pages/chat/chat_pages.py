@@ -1,7 +1,9 @@
+import os
 import gradio as gr
 from pathlib import Path
 from textwrap import dedent
 from plotly.io import from_json
+import arxiv
 
 import settings
 
@@ -10,14 +12,23 @@ from apps.pages.chat.control import ConversationControl
 from apps.pages.chat.chat_suggestion import ChatSuggestion
 from apps.pages.chat.chat_pannel import ChatPanel
 from apps.files.ui import File
-from apps.pipelines import FilePipeline, LLMPipeline
+from apps.pipelines import FilePipeline, LLMPipeline, ArxivPipeline
 from apps.reasoning import FullQAPipeline
+
+from .utils import download_arxiv_pdf, is_arxiv_url
 
 from models.indices.ingests.files import VP_DEFAULT_FILE_EXTRACTORS
 
 DEFAULT_QUESTION = (
     "What is the summary of this paper?"
 )
+
+chat_input_focus_js = """
+function() {
+    let chatInput = document.querySelector("#chat-input textarea");
+    chatInput.focus();
+}
+"""
 
 MINDMAP_HTML_EXPORT_TEMPLATE = dedent(
     """
@@ -160,7 +171,7 @@ class ChatPage(BasePage):
                     
                     self.quick_urls = gr.Textbox(
                         placeholder=(
-                            "Or paste URLs"
+                            "Paste Arxiv URLs\n(https://arxiv.org/abs/xxx)"
                         ),
                         lines=1,
                         container=False,
@@ -169,6 +180,27 @@ class ChatPage(BasePage):
                             "quick-url"
                         ),
                     )
+                
+                with gr.Blocks() as _:
+                    with gr.Row():
+                        self.predefined_interested_categories = gr.CheckboxGroup(
+                            choices = [
+                                "RAG", "Agent", "Foundation Model"
+                            ],
+                            label="选择感兴趣类别（可多选）"
+                        )
+                    with gr.Row():
+                        self.user_add_interested_categories = gr.Textbox(
+                            placeholder="输入自定义感兴趣类型，多个用逗号分隔",
+                            label="自定义感兴趣类别"
+                        )
+                    with gr.Row():
+                        self.arxiv_max_results = gr.Slider(
+                            minimum=1, maximum=20, step=1, value=5,
+                            label="查询数量 (Max Results)",
+                            interactive=True
+                        )
+                        self.arxiv_search_btn = gr.Button("Arxiv查询检索")
             
             with gr.Column(scale=6, elem_id="chat-area"):
                 self.chat_panel = ChatPanel(self._app)
@@ -185,7 +217,65 @@ class ChatPage(BasePage):
             
         self.followup_questions = self.chat_suggestion.examples
         self.followup_questions_ui = self.chat_suggestion.accordion
+    
+    def on_register_events(self):
+        print(f"register events...")
+        self.on_register_quick_uploads()
+        self.on_register_chat_event()
 
+        def toggle_chat_suggestion(current_state):
+            return current_state, gr.update(visible=current_state)
+        
+        def raise_error_on_state(state):
+            if not state:
+                raise ValueError("Chat suggestion disabled")
+            
+        
+        onSuggestChatEvent = {
+            "fn": self.suggest_chat_conv,
+            "inputs": [
+                self.chat_panel.chatbot,
+                self._use_suggestion
+            ],
+            "outputs": [
+                self.followup_questions_ui,
+                self.followup_questions
+            ],
+            "show_progress": "hidden"
+        }
+        self.chat_control.cb_suggest_chat.change(
+            fn=toggle_chat_suggestion,
+            inputs=[self.chat_control.cb_suggest_chat],
+            outputs=[self._use_suggestion, self.followup_questions_ui],
+            show_progress="hidden"
+        ).then(
+            fn=raise_error_on_state,
+            inputs=[self._use_suggestion],
+            show_progress="hidden"
+        ).success(
+            **onSuggestChatEvent
+        )
+
+        self.followup_questions.select(
+            self.chat_suggestion.select_example,
+            outputs=[self.chat_panel.text_input],
+            show_progress="hidden",
+        ).then(
+            fn=None,
+            inputs=None,
+            outputs=None,
+            js=chat_input_focus_js,
+        )
+
+        self.arxiv_search_btn.click(
+            fn=self.search_arxiv_papers,
+            inputs=[
+                self.predefined_interested_categories,
+                self.user_add_interested_categories,
+                self.arxiv_max_results
+            ],
+            outputs=self.chat_panel.chatbot
+        )
     
     def on_upload(self, files):
         print("Upload called:", files)
@@ -226,6 +316,26 @@ class ChatPage(BasePage):
                 inputs=None,
                 outputs=None,
                 js=chat_input_focus_js_with_submit,
+            )
+            .success(
+                fn=lambda: gr.update(value=None),
+                outputs=self._app.chat_page.quick_urls,
+            )
+        )
+
+        quickURLUploadedEvent = (
+            self._app.chat_page.quick_urls.submit(
+                fn=lambda: gr.update(
+                    value="Please wait for the indexing process "
+                    "to complete before adding your question."
+                ),
+                outputs=self._app.chat_page.quick_file_upload_status,
+            )
+            .then(
+                fn=self.index_fn_url_with_default_loaders,
+                inputs=self.quick_urls,
+                outputs=self._app.chat_page.quick_file_upload_status,
+                concurrency_limit=10,
             )
         )
     
@@ -279,11 +389,6 @@ class ChatPage(BasePage):
         }
         chat_event = chat_event.success(**onSuggestChatEvent)
     
-    def on_register_events(self):
-        print(f"register events...")
-        self.on_register_quick_uploads()
-        self.on_register_chat_event()
-    
     def _json_to_plot(self, json_dict: dict | None):
         if json_dict:
             plot = from_json(json_dict)
@@ -304,6 +409,16 @@ class ChatPage(BasePage):
             settings: the settings of the app
         """
         self.file_pipeline = FilePipeline(files[0])
+        self.llm_pipeline = LLMPipeline()
+    
+    def index_fn_url_with_default_loaders(self, url):
+        if not is_arxiv_url(url):
+            raise ValueError("All URLs must be valid arXiv URLs")
+        print(f"get valid url: {url}")
+        output_file = download_arxiv_pdf(url, output_path=os.environ.get("GRADIO_TEMP_DIR", "/tmp"))
+        print(f"pdf had been saved to {output_file}")
+        
+        self.file_pipeline = FilePipeline(output_file)
         self.llm_pipeline = LLMPipeline()
     
     def submit_msg(
@@ -390,7 +505,23 @@ class ChatPage(BasePage):
         use_suggestion
     ):
         if use_suggestion:
-            pass
+            return gr.update(visible=True), gr.update()
 
         return gr.update(visible=False), gr.update()
+    
+    def search_arxiv_papers(
+        self,
+        predefined_categories,
+        user_added_categories,
+        max_results
+    ):
+        self.arxiv_pipeline = ArxivPipeline()
+        selected_categories = predefined_categories or []
+        if user_added_categories.strip():
+            selected_categories += [kw.strip() for kw in user_added_categories.split(",")]
+        formatted_query = " AND ".join(f'all:"{kw.strip()}"' for kw in selected_categories)
+        print(f"构建的arxiv查询关键词是：{formatted_query}")
+        
+        self.arxiv_pipeline.run(formatted_query, max_results)
+
 

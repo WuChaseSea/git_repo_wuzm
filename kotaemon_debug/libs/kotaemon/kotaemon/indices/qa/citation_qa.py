@@ -206,6 +206,7 @@ class AnswerWithContextPipeline(BaseComponent):
         # retrieve the citation
         citation = None
         mindmap = None
+        citation = self.citation_pipeline(context=evidence, question=question)
 
         def citation_call():
             nonlocal citation
@@ -280,7 +281,7 @@ class AnswerWithContextPipeline(BaseComponent):
             citation_thread.join(timeout=CITATION_TIMEOUT)
         if mindmap_thread:
             mindmap_thread.join(timeout=CITATION_TIMEOUT)
-
+        
         answer = Document(
             text=output,
             metadata={

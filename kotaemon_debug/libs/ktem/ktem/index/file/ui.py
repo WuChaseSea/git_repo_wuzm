@@ -602,7 +602,6 @@ class FileIndexPage(BasePage):
                 self._app.chat_page.first_indexing_url_fn = (
                     self.index_fn_url_with_default_loaders
                 )
-
                 if not KH_DEMO_MODE:
                     quickUploadedEvent = (
                         self._app.chat_page.quick_file_upload.upload(

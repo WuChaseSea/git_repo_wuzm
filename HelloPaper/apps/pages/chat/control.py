@@ -24,14 +24,14 @@ class ConversationControl():
                 elem_id="toggle-dark-button",
             )
             # 聊天扩展按钮
-            self.btn_chat_expand = gr.Button(
-                value="",
-                icon=f"{ASSETS_DIR}/expand.svg",
-                scale=1,
-                size="sm",
-                elem_classes=["no-background", "body-text-color"],
-                elem_id="chat-expand-button",
-            )
+            # self.btn_chat_expand = gr.Button(
+            #     value="",
+            #     icon=f"{ASSETS_DIR}/expand.svg",
+            #     scale=1,
+            #     size="sm",
+            #     elem_classes=["no-background", "body-text-color"],
+            #     elem_id="chat-expand-button",
+            # )
             # pannel扩展按钮
             self.btn_info_expand = gr.Button(
                 value="",
@@ -52,16 +52,16 @@ class ConversationControl():
                 """,
             )
         # 聊天 conversation选择界面
-        self.conversation_id = gr.State(value="")
-        self.conversation = gr.Dropdown(
-            label="Chat sessions",
-            choices=[],
-            container=False,
-            filterable=True,
-            interactive=True,
-            elem_classes=["unset-overflow"],
-            elem_id="conversation-dropdown",
-        )
+        # self.conversation_id = gr.State(value="")
+        # self.conversation = gr.Dropdown(
+        #     label="Chat sessions",
+        #     choices=[],
+        #     container=False,
+        #     filterable=True,
+        #     interactive=True,
+        #     elem_classes=["unset-overflow"],
+        #     elem_id="conversation-dropdown",
+        # )
         with gr.Row() as self._new_delete:
             # 是否使用 conversation suggestion
             self.cb_suggest_chat = gr.Checkbox(

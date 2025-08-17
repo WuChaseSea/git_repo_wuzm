@@ -133,7 +133,7 @@ class FullQAPipeline(BaseReasoning):
 
             retriever_docs_text = []
             retriever_docs_plot = []
-
+            
             for doc in retriever_docs:
                 if doc.metadata.get("type", "") == "plot":
                     retriever_docs_plot.append(doc)
@@ -304,7 +304,7 @@ class FullQAPipeline(BaseReasoning):
             scoring_thread.start()
         else:
             scoring_thread = None
-
+        
         answer = yield from self.answering_pipeline.stream(
             question=message,
             history=history,

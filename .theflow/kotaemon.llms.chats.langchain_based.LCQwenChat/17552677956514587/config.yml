@@ -1,0 +1,13 @@
+allow_extra: false
+default_backend:
+  __type__: theflow.backends.Backend
+function_name: '{{ theflow.callbacks.function_name__class_name }}'
+middleware_section: default
+middleware_switches:
+  theflow.middleware.CachingMiddleware: false
+  theflow.middleware.SkipComponentMiddleware: true
+  theflow.middleware.TrackProgressMiddleware: true
+params_publish: false
+params_subscribe: true
+run_id: '{{ theflow.callbacks.run_id__timestamp }}'
+store_result: '{{ theflow.callbacks.store_result__pipeline_name }}'
