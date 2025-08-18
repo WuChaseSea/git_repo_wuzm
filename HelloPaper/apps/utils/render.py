@@ -81,7 +81,7 @@ class Render:
         pdf_path = doc.metadata.get("file_path", "")
 
         if not os.path.isfile(pdf_path):
-            print(f"pdf-path: {pdf_path} does not exist")
+            # print(f"pdf-path: {pdf_path} does not exist")
             return html_content
 
         is_pdf = doc.metadata.get("file_type", "") == "application/pdf"
@@ -233,5 +233,32 @@ class Render:
         return Render.collapsible(
             header=rendered_header,
             content=rendered_score + rendered_doc_content,
+            open=open_collapsible,
+        )
+    
+    @staticmethod
+    def collapsible_with_arxiv_result(
+        doc: RetrievedDocument,
+        override_text: str | None = None,
+        highlight_text: str | None = None,
+        open_collapsible: bool = False,
+    ) -> str:
+        title = doc.metadata["Title"]
+        link = doc.metadata["Link"]
+
+        rendered_header = Render.preview(
+            f"<b><span style='color:red;'>{title}{get_header(doc)}</span></b>"
+            f"<br><a href='{link}' target='_blank'>{link}</a>",
+            doc,
+            highlight_text=highlight_text,
+        )
+        text = doc.text
+        rendered_doc_content = Render.table(text)
+        rendered_doc_content = (
+            f"<div class='evidence-content'>{rendered_doc_content}</div>"
+        )
+        return Render.collapsible(
+            header=rendered_header,
+            content=rendered_doc_content,
             open=open_collapsible,
         )

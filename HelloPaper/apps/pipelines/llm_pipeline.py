@@ -29,9 +29,14 @@ class LLMPipeline():
         self.mindmap_pipeline = MindmapPipeline(self.llm)
         self.citation_pipeline = CitationPipeline(self.llm_chat)
     
-    def build_prompt_template(self, mode):
+    def build_prompt_template(self, mode, desc=None, prompt=None):
         if mode == "text":
-            self.qa_template_text = PromptTemplate(DEFAULT_QA_TEXT_PROMPT)
+            if desc is None:
+                self.qa_template_text = PromptTemplate(DEFAULT_QA_TEXT_PROMPT)
+            else:
+                template_tmp = PromptTemplate(prompt)
+                var_name = f"template_{desc}_{mode}"
+                setattr(self, var_name, template_tmp)
     
     def stream(self, question, history, context):
         qa_prompt = self.qa_template_text.format(

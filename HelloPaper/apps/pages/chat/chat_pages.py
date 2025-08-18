@@ -274,7 +274,13 @@ class ChatPage(BasePage):
                 self.user_add_interested_categories,
                 self.arxiv_max_results
             ],
-            outputs=self.chat_panel.chatbot
+            outputs=[
+                self.chat_panel.chatbot,
+                self.info_panel,
+                self.plot_panel
+            ],
+            concurrency_limit=20,
+            show_progress="minimal"
         )
     
     def on_upload(self, files):
@@ -459,6 +465,7 @@ class ChatPage(BasePage):
         
         try:
             for response in qa_pipeline.stream(message=chat_input, history=chat_history):
+                import ipdb;ipdb.set_trace()
                 if not isinstance(response, Document):
                     continue
                 if response.channel is None:
@@ -521,7 +528,32 @@ class ChatPage(BasePage):
             selected_categories += [kw.strip() for kw in user_added_categories.split(",")]
         formatted_query = " AND ".join(f'all:"{kw.strip()}"' for kw in selected_categories)
         print(f"构建的arxiv查询关键词是：{formatted_query}")
-        
-        self.arxiv_pipeline.run(formatted_query, max_results)
 
+        text, refs, plot, plot_gr = "", "", None, gr.update(visible=False)
+        yield (
+            [(None, f"查询的关键词有：{', '.join(selected_categories)}")],
+            refs,
+            plot_gr
+        )
+        
+        try:
+            for response in self.arxiv_pipeline.stream(formatted_query, max_results):
+                if not isinstance(response, Document):
+                    continue
+                if response.channel is None:
+                    continue
+                if response.channel == "info":
+                    if response.content is None:
+                        refs = ""
+                    else:
+                        refs += response.content
+                
+                yield (
+                    [(None, f"查询的关键词有：{', '.join(selected_categories)}")],
+                    refs,
+                    plot_gr
+                )
+
+        except ValueError as e:
+            print(e)
 
