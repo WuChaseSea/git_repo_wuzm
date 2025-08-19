@@ -19,6 +19,19 @@ PROJECT_ROOT = get_project_root()
 WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
 
 
+class LLMSettings(BaseModel):
+    model: str = Field(..., description="Model name")
+    base_url: str = Field(..., description="API base URL")
+    api_key: str = Field(..., description="API key")
+    max_tokens: int = Field(4096, description="Maximum number of tokens per request")
+    max_input_tokens: Optional[int] = Field(
+        None,
+        description="Maximum input tokens to use across all requests (None for unlimited)",
+    )
+    temperature: float = Field(1.0, description="Sampling temperature")
+    api_type: str = Field(..., description="BAILIAN")
+
+
 class SearchSettings(BaseModel):
     engine: str = Field(default="Google", description="Search engine the llm to use")
     fallback_engines: List[str] = Field(
@@ -44,6 +57,7 @@ class SearchSettings(BaseModel):
 
 
 class AppConfig(BaseModel):
+    llm_config: Dict[str, LLMSettings]
     search_config: Optional[SearchSettings] = Field(
         None, description="Search configuration"
     )
@@ -87,6 +101,19 @@ class Config:
 
     def _load_initial_config(self):
         raw_config = self._load_config()
+        base_llm = raw_config.get("llm", {})
+        llm_overrides = {
+            k: v for k, v in raw_config.get("llm", {}).items() if isinstance(v, dict)
+        }
+        default_settings = {
+            "model": base_llm.get("model"),
+            "base_url": base_llm.get("base_url"),
+            "api_key": os.getenv("DASHSCOPE_API_KEY"),
+            "max_tokens": base_llm.get("max_tokens", 4096),
+            "max_input_tokens": base_llm.get("max_input_tokens"),
+            "temperature": base_llm.get("temperature", 1.0),
+            "api_type": base_llm.get("api_type", "")
+        }
 
         search_config = raw_config.get("search", {})
         search_settings = None
@@ -94,10 +121,21 @@ class Config:
             search_settings = SearchSettings(**search_config)
 
         config_dict = {
+            "llm_config": {
+                "default": default_settings,
+                **{
+                    name: {**default_settings, **override_config}
+                    for name, override_config in llm_overrides.items()
+                },
+            },
             "search_config": search_settings
         }
         self._config = AppConfig(**config_dict)
     
+    @property
+    def llm_config(self) -> Optional[LLMSettings]:
+        return self._config.llm_config
+
     @property
     def search_config(self) -> Optional[SearchSettings]:
         return self._config.search_config
