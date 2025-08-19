@@ -21,3 +21,18 @@ class ReActAgent(BaseAgent, ABC):
     max_steps: int = 10
     current_step: int = 0
 
+    @abstractmethod
+    async def think(self) -> bool:
+        """Process current state and decide next action"""
+    
+    @abstractmethod
+    async def act(self) -> str:
+        """Execute decided actions"""
+    
+    async def step(self) -> str:
+        """Execute a single step: think and act"""
+        should_act = await self.think()
+        if not should_act:
+            return "Thinking complete - no action needed"
+        return await self.act()
+
