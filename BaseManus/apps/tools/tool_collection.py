@@ -13,7 +13,7 @@ class ToolCollection:
         arbitrary_types_allowed = True
     
     def __init__(self, *tools: BaseTool):
-        self.tools = self.tools
+        self.tools = tools
         self.tool_map = {tool.name: tool for tool in tools}
     
     def __iter__(self):

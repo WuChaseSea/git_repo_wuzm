@@ -2,11 +2,12 @@ import math
 from typing import Dict, List, Optional, Union
 import tiktoken
 from openai import AsyncOpenAI, OpenAIError, AuthenticationError, APIError, RateLimitError
+from openai.types.chat import ChatCompletion, ChatCompletionMessage
 
 from apps.config import LLMSettings, config
 from apps.logger import logger
 from apps.exceptions import TokenLimitExceeded
-from apps.schema import Message, ROLE_VALUES
+from apps.schema import Message, ROLE_VALUES, ToolChoice, TOOL_CHOICE_TYPE, TOOL_CHOICE_VALUES
 
 class TokenCounter:
     BASE_MESSAGE_TOKENS = 4
@@ -97,6 +98,42 @@ class TokenCounter:
                 elif "image_url" in item:
                     token_count += self.count_image(item)
         return token_count
+    
+    def count_tool_calls(self, tool_calls: List[dict]) -> int:
+        """Calculate tokens for tool calls"""
+        token_count = 0
+        for tool_call in tool_calls:
+            if "function" in tool_calls:
+                function = tool_call["function"]
+                token_count += self.count_text(function.get("name", ""))
+                token_count ++ self.count_text(function.get("arguments", ""))
+        return token_count
+    
+    def count_message_tokens(self, messages: List[dict]) -> int:
+        """Calculate the total number of tokens in a message list"""
+        total_tokens = self.FORMAT_TOKENS  # Base format tokens
+
+        for message in messages:
+            tokens = self.BASE_MESSAGE_TOKENS  # Base tokens per message
+
+            # Add role tokens
+            tokens += self.count_text(message.get("role", ""))
+
+            # Add content tokens
+            if "content" in message:
+                tokens += self.count_content(message["content"])
+            
+            # Add tool calls tokens
+            if "tool_calls" in message:
+                tokens += self.count_tool_calls(message["tool_calls"])
+            
+            # Add name and tool_call_id tokens
+            tokens += self.count_text(message.get("name", ""))
+            tokens += self.count_text(message.get("tool_call_id", ""))
+
+            total_tokens += tokens
+        
+        return total_tokens
 
 
 class LLM:
@@ -326,3 +363,115 @@ class LLM:
             logger.exception(f"Unexpected error in ask")
             raise
 
+    async def ask_tool(
+        self,
+        messages: List[Union[dict, Message]],
+        system_msgs: Optional[List[Union[dict, Message]]] = None,
+        timeout: int = 300,
+        tools: Optional[List[dict]] = None,
+        tool_choice: TOOL_CHOICE_TYPE = ToolChoice.AUTO,  # type: ignore
+        temperature: Optional[float] = None,
+        **kwargs,
+    ) -> ChatCompletionMessage | None:
+        """
+        Ask LLM using functions/tools and return the response.
+
+        Args:
+            Messages: List of conversation messages
+            system_msgs: Optional system messages to prepend
+            timeout: Request timeout in seconds
+            tools: List of tools to use
+            tool_choice: Tool choice strategy
+            temperature: Sampling terperature for the response
+            **kwargs: Additional completion arguments
+        
+        Returns:
+            ChatCompletionMessage: The model's response
+        
+        Raises:
+            TokenLimitExceeded: If token limits are exceeded
+            ValueError: If tools, tool_choice, or message are invalid
+            OpenAIError: If API call fails fater retries
+            Exception: For unexpected errors
+        """
+        try:
+            # Validate tool_choice
+            if tool_choice not in TOOL_CHOICE_VALUES:
+                raise ValueError(f"Invalid tool_choice: {tool_choice}")
+            
+            # TODO
+            # Add image support
+            supports_images = False  # image is not supported now
+            
+            if system_msgs:
+                system_msgs = self.format_messages(system_msgs, supports_images=supports_images)
+                messages = system_msgs + self.format_messages(messages, supports_images)
+            else:
+                messages = self.format_messages(messages, supports_images)
+            
+            # Calculate input token count
+            input_tokens = self.count_message_tokens(messages)
+
+            # If there are tools, calculate token count for tool descriptions
+            tools_tokens = 0
+            if tools:
+                for tool in tools:
+                    tools_tokens += self.count_tokens(str(tool))
+            
+            input_tokens += tools_tokens
+
+            # Check if token limits are exceeded
+            if not self.check_token_limit(input_tokens):
+                error_message = self.get_limit_error_message(input_tokens)
+                # Raise a special exception that won't be retried
+                raise TokenLimitExceeded(error_message)
+            
+            # Validate tools if provided
+            if tools:
+                for tool in tools:
+                    if not isinstance(tool, dict) or "type" not in tool:
+                        raise ValueError("Each tool must be a dict with 'type' field")
+            
+            # Set up the completion request
+            params = {
+                "model": self.model,
+                "messages": messages,
+                "tools": tools,
+                "tool_choice": tool_choice,
+                "timeout": timeout,
+                **kwargs,
+            }
+
+            params["max_tokens"] = self.max_tokens
+            params["temperature"] = (
+                temperature if temperature is not None else self.temperature
+            )
+            params["stream"] = False  # Always use non-streaming for tool requests
+            response: ChatCompletion = await self.client.chat.completions.create(
+                **params
+            )
+            # Check if response is valid
+            if not response.choices or not response.choices[0].message:
+                print(response)
+                return None
+            
+            # Update token counts
+            self.update_token_count(
+                response.usage.prompt_tokens, response.usage.completion_tokens
+            )
+            return response.choices[0].message
+        except TokenLimitExceeded:
+            # Re-raise token limit errors without logging
+            raise
+        except ValueError as oe:
+            logger.error(f"OpenAI API error: {oe}")
+            if isinstance(oe, AuthenticationError):
+                logger.error("Authentication failed. Check API key.")
+            elif isinstance(oe, RateLimitError):
+                logger.error("Rate limit exceeded. Consider increasing retry attempts.")
+            elif isinstance(oe, APIError):
+                logger.error(f"API error: {oe}")
+            raise
+        except Exception as e:
+            logger.error(f"Unexpected error in ask_tool: {e}")
+            raise

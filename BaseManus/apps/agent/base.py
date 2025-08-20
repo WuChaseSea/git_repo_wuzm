@@ -182,3 +182,12 @@ class BaseAgent(BaseModel, ABC):
         self.next_step_prompt = f"{stuck_prompt}\n{self.next_step_prompt}"
         logger.warning(f"Agent detected stuck state. Added prompt: {stuck_prompt}")
 
+    @property
+    def messages(self) -> List[Message]:
+        """Retrieve a list of messages from the agent's memory"""
+        return self.memory.messages
+    
+    @messages.setter
+    def messages(self, value: List[Message]):
+        """Set the list of messages in the agent's memory"""
+        self.memory.messages = value
