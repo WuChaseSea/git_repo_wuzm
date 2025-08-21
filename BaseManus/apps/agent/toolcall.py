@@ -9,7 +9,7 @@ from apps.logger import logger
 from apps.exceptions import TokenLimitExceeded
 from apps.prompts.toolcall import SYSTEM_PROMPT, NEXT_STEP_PROMPT
 from apps.schema import TOOL_CHOICE_TYPE, AgentState, Message, ToolCall, ToolChoice
-from apps.tools import CreateChatCompletion, Terminate, ToolCollection
+from apps.tools import CreateChatCompletion, Terminate, ToolCollection, ArxivSearch
 
 
 TOOL_CALL_REQUIRED = "Tool calls required but none provided"
@@ -25,7 +25,7 @@ class ToolcallAgent(ReActAgent):
     next_step_prompt: str = NEXT_STEP_PROMPT
 
     available_tools: ToolCollection = ToolCollection(
-        CreateChatCompletion(), Terminate()
+        CreateChatCompletion(), ArxivSearch(), Terminate()
     )
     tool_choices: TOOL_CHOICE_TYPE = ToolChoice.AUTO  # type: ignore
     special_tool_names: List[str] = Field(default_factory=lambda: [Terminate().name])

@@ -2,9 +2,9 @@ import asyncio
 from typing import Optional, List
 import arxiv
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
-from apps.tools.base import ToolResult
+from apps.tools.base import BaseTool, ToolResult
 
 
 class ArxivResult(BaseModel):
@@ -21,11 +21,27 @@ class ArxivResult(BaseModel):
 
 class ArxivResponse(ToolResult):
     """Structured response from arxiv search tool, inh"""
-    query: str = Field(description="Arxiv search keywords")
+    query: List = Field(description="Arxiv search keywords")
     results: List[ArxivResult] = Field(default_factory=list, description="List of search results")
 
+    @model_validator(mode="after")
+    def popupate_output(self) -> "ArxivResponse":
+        """Polupate output or error fields based on search result."""
+        if self.error:
+            return self
+        
+        result_text  = [f"Search results for '{self.query}':"]
 
-class ArxivSearch(BaseModel):
+        for i, result in enumerate(self.results, 1):
+            title = result.title.strip() or "No title"
+            result_text.append(f"\n{i}. {title}")
+            result_text.append(f"    URL: {result.link}")
+        
+        self.output = "\n".join(result_text)
+        return self
+
+
+class ArxivSearch(BaseTool):
     """Class for searching arxiv papers"""
 
     name: str = "arxiv_search"
@@ -47,6 +63,10 @@ class ArxivSearch(BaseModel):
             },
         },
     }
+    arxiv_client: arxiv.Client = arxiv.Client()
+
+    # def __init__(self):
+    #     self.arxiv_client = arxiv.Client()
 
     async def execute(
         self,
@@ -55,12 +75,21 @@ class ArxivSearch(BaseModel):
     ) -> ArxivResponse:
         formmatted_query = " AND ".join(f'all:"{kw.strip()}"' for kw in query)
         search_results = arxiv.Search(
-            query=query,
+            query=formmatted_query,
             max_results=num_results,
             sort_by=arxiv.SortCriterion.SubmittedDate
         )
         results = self.arxiv_client.results(search_results)
         results = list(results)
-        results_info  = [
-            
-        ]
+        results_response  = ArxivResponse(
+            query=query,
+            results=[
+                ArxivResult(
+                    title=result.title,
+                    link=result.links[-1].href,
+                    abstract=result.summary,
+                )
+                for result in results
+            ]
+        )
+        return results_response

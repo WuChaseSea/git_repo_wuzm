@@ -3,6 +3,7 @@ from apps.tools.create_chat_completion import CreateChatCompletion
 from apps.tools.terminate import Terminate
 from apps.tools.tool_collection import ToolCollection
 from apps.tools.web_search import WebSearch
+from apps.tools.arxiv_search import ArxivSearch
 
 
 __all__ = [
@@ -10,5 +11,6 @@ __all__ = [
     "CreateChatCompletion",
     "Terminate",
     "ToolCollection",
-    "WebSearch"
+    "WebSearch",
+    "ArxivSearch",
 ]

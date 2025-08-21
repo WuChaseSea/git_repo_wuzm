@@ -288,7 +288,7 @@ class WebSearch(BaseTool):
             ]
         
         if failed_engines:
-            logger.error(f"All search engine failed: {", ".join(failed_engines)}")
+            logger.error(f"All search engine failed: {', '.join(failed_engines)}")
         return []
     
     def _get_engine_order(self) -> List[str]:
