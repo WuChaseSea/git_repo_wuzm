@@ -44,7 +44,6 @@ class ToolCallAgent(ReActAgent):
         
         try:
             # Get response with tool options
-            import pdb;pdb.set_trace()
             response = await self.llm.ask_tool(
                 messages=self.messages,
                 system_msgs=(
