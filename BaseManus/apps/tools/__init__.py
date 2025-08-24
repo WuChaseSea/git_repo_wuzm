@@ -4,6 +4,7 @@ from apps.tools.terminate import Terminate
 from apps.tools.tool_collection import ToolCollection
 from apps.tools.web_search import WebSearch
 from apps.tools.arxiv_search import ArxivSearch
+from apps.tools.str_replace_editor import StrReplaceEditor
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "ToolCollection",
     "WebSearch",
     "ArxivSearch",
+    "StrReplaceEditor"
 ]
