@@ -6,6 +6,7 @@ from typing import Any, DefaultDict, List, Literal, Optional, get_args
 
 from apps.tools import BaseTool
 from apps.exceptions import ToolError
+from apps.tools.base import ToolResult
 from apps.tools.files import PathLike, FileOperator, LocalFileOperator
 
 
@@ -107,7 +108,7 @@ class StrReplaceEditor(BaseTool):
                 raise ToolError(f"Parameter `file_text` is required for command: create")
             await operator.write_file(path, file_text)
             self._file_history[path].append(file_text)
-            result = ToolError(output=f"File created successfully at: {path}")
+            result = ToolResult(output=f"File created successfully at: {path}")
         elif command == "str_replace":
             if old_str is None:
                 raise ToolError("Paramter `old_str` is required for command: str_replace")

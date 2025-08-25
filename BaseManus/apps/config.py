@@ -139,6 +139,11 @@ class Config:
     @property
     def search_config(self) -> Optional[SearchSettings]:
         return self._config.search_config
+    
+    @property
+    def workspace_root(self) -> Path:
+        """Get the workspace root dicectory"""
+        return WORKSPACE_ROOT
 
 
 config = Config()

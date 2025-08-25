@@ -2,6 +2,7 @@ import argparse
 import asyncio
 
 from apps.agent.toolcall import ToolcallAgent
+from apps.agent.scimind import SCIMind
 from apps.logger import logger
 
 
@@ -12,7 +13,8 @@ async def main():
         "--prompt", type=str, required=False, help="Input prompt for the agent"
     )
     args = parser.parse_args()
-    agent = ToolcallAgent()
+    # agent = ToolcallAgent()
+    agent = SCIMind()
     try:
         # Use commmand line prompt if provided, otherwise ask for input
         prompt = args.prompt if args.prompt else input("Enter you prompt: ")
