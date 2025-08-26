@@ -10,7 +10,7 @@ class ArxivPipeline():
 
     def __init__(self):
         self.arxiv_client = arxiv.Client()
-        self.llm = LLMPipeline()
+        self.llm_pipeline = LLMPipeline()
     
     def stream(self, query, max_results):
         search_results = arxiv.Search(
@@ -39,15 +39,38 @@ class ArxivPipeline():
         ]
         yield from results_info
 
+        answers = []
         for result in results:
-            answer = self.summary_single_paper_by_abstract(result)
+            answer = yield from self.summary_single_paper_by_abstract(result)
+            answers.append(answer)
     
     def summary_single_paper_by_abstract(self, result):
-        self.llm.build_prompt_template(mode="text", desc="summary_abstract", prompt=SUMMARY_PAPER_BY_ABSTRACT)
+        self.llm_pipeline.build_prompt_template(mode="text", desc="summary_abstract", prompt=SUMMARY_PAPER_BY_ABSTRACT)
         var_name = f"template_summary_abstract_text"
-        template_text = getattr(self.llm, var_name)
-        template_text.format(
+        template_text = getattr(self.llm_pipeline, var_name)
+        qa_prompt = template_text.format(
             title=result.title,
             abstract=result.summary
         )
-        import ipdb;ipdb.set_trace()
+        messages = []
+        messages.append(
+            {
+                "role": "user",
+                "content": qa_prompt
+            }
+        )
+        print(f"LLM summarying")
+        output = ""
+        before_output = None
+        for out_msg in self.llm_pipeline.llm.chat(messages, stream=True):
+            now_output = out_msg[0]["content"]
+            if before_output:
+                now_output = now_output[len(before_output):]
+                before_output += now_output
+            else:
+                before_output = now_output
+            output += now_output
+            yield Document(channel="chat", content=now_output)
+        print(f"LLM summary ended.")
+        answer = Document(text=output)
+        return answer

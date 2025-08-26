@@ -272,7 +272,8 @@ class ChatPage(BasePage):
             inputs=[
                 self.predefined_interested_categories,
                 self.user_add_interested_categories,
-                self.arxiv_max_results
+                self.arxiv_max_results,
+                self.chat_panel.chatbot
             ],
             outputs=[
                 self.chat_panel.chatbot,
@@ -465,7 +466,6 @@ class ChatPage(BasePage):
         
         try:
             for response in qa_pipeline.stream(message=chat_input, history=chat_history):
-                import ipdb;ipdb.set_trace()
                 if not isinstance(response, Document):
                     continue
                 if response.channel is None:
@@ -520,18 +520,22 @@ class ChatPage(BasePage):
         self,
         predefined_categories,
         user_added_categories,
-        max_results
+        max_results,
+        chat_history
     ):
         self.arxiv_pipeline = ArxivPipeline()
         selected_categories = predefined_categories or []
         if user_added_categories.strip():
             selected_categories += [kw.strip() for kw in user_added_categories.split(",")]
         formatted_query = " AND ".join(f'all:"{kw.strip()}"' for kw in selected_categories)
-        print(f"构建的arxiv查询关键词是：{formatted_query}")
+        chat_output = f"构建的arxiv查询关键词是：{formatted_query}"
+        print(chat_output)
+        chat_input = "Search recent papers."
+        chat_history.append((chat_input, chat_output))
 
         text, refs, plot, plot_gr = "", "", None, gr.update(visible=False)
         yield (
-            [(None, f"查询的关键词有：{', '.join(selected_categories)}")],
+            [(chat_input, chat_output)],
             refs,
             plot_gr
         )
@@ -542,6 +546,11 @@ class ChatPage(BasePage):
                     continue
                 if response.channel is None:
                     continue
+                if response.channel == "chat":
+                    if response.content is None:
+                        text = ""
+                    else:
+                        text += response.content
                 if response.channel == "info":
                     if response.content is None:
                         refs = ""
@@ -549,7 +558,7 @@ class ChatPage(BasePage):
                         refs += response.content
                 
                 yield (
-                    [(None, f"查询的关键词有：{', '.join(selected_categories)}")],
+                    chat_history + [(None, text)],
                     refs,
                     plot_gr
                 )
