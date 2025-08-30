@@ -149,48 +149,6 @@ class BaseAgent(BaseModel, ABC):
                 self.state = AgentState.IDLE
                 results.append(f"Terminated: Reached max steps ({self.max_steps})")
         return "\n".join(results) if results else "No steps executed"
-    
-    async def run_stream(self, request: Optional[str] = None) -> str:
-        """Execute the agent's main loop asynchronously and yield every step result.
-
-        Args:
-            request: Optional initial user request to process.
-        
-        Returns:
-            A string summarizing the execution results.
-        
-        Raises:
-            RuntimeError: If the agent is not in IDLE state at start.
-        """
-        if self.state != AgentState.IDLE:
-            raise RuntimeError(f"Cannot run agent from state: {self.state}")
-        
-        if request:
-            self.update_memory("user", request)
-        
-        step_executed = False
-        async with self.state_context(AgentState.RUNNING):
-            while (
-                self.current_step < self.max_steps and self.state != AgentState.FINISHED
-            ):
-                self.current_step += 1
-                logger.info(f"Executing step {self.current_step}/{self.max_steps}")
-                step_result = await self.step()
-                step_executed = True
-
-                if self.is_stuck():
-                    self.handle_stuck_state()
-                
-                step_result = f"Step {self.current_step}: {step_result}"
-                yield step_result
-            
-            if self.current_step >= self.max_steps:
-                self.current_step = 0
-                self.state = AgentState.IDLE
-                step_result = f"Terminated: Reached max steps ({self.max_steps})"
-                yield step_result
-        if not step_executed:
-            yield "No steps executed"
         
     @abstractmethod
     async def step(self) -> str:
