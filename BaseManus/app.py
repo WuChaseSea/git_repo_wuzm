@@ -43,10 +43,10 @@ with gr.Blocks() as demo:
         with gr.Column(scale=3):
             gr.Markdown("# 🧠 SCIMind | 科研论文分析Agent")
             
-            log_box = gr.Textbox(label="运行日志", lines=15, interactive=False)
-            output = gr.Textbox(label="结果输出", lines=15, interactive=False)
+            output = gr.Textbox(label="结果输出", lines=10, interactive=False)
+            log_box = gr.Textbox(label="运行日志", lines=10, interactive=False)
             btn = gr.Button("开始分析")
             btn.click(fn=run_async, inputs=prompt, outputs=[log_box, output])
 
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(inbrowser=True)

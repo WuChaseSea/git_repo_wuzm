@@ -11,6 +11,7 @@ from apps.tools import (
     ArxivSearch,
     StrReplaceEditor,
     CreateChatCompletion,
+    SummaryAnswer
 )
 from apps.logger import logger
 from apps.schema import AgentState
@@ -39,6 +40,10 @@ class SCIMind(ToolcallAgent):
 
     special_tool_names: list[str] = Field(default_factory=lambda: [Terminate().name])
 
+    def __init__(self):
+        super().__init__()
+        self.available_tools.add_tool(SummaryAnswer.with_llm(self.llm))
+
     async def run_stream(self, request: Optional[str] = None) -> Any:
         """Execute the agent's main loop asynchronously and yield every step result.
 
@@ -65,7 +70,11 @@ class SCIMind(ToolcallAgent):
                 self.current_step += 1
                 logger.info(f"Executing step {self.current_step}/{self.max_steps}")
                 step_result = await self.step()
-                step_output = "\n".join(step_result.split("\n")[1:])
+                step_output = ""
+                if self.tool_calls:
+                    step_tool = self.tool_calls[0].function.name
+                    if step_tool == "summary_answer":
+                        step_output = "\n".join(step_result.split("\n")[1:])
                 step_executed = True
 
                 if self.is_stuck():
@@ -82,6 +91,9 @@ class SCIMind(ToolcallAgent):
                 self.state = AgentState.IDLE
                 step_result = f"Terminated: Reached max steps ({self.max_steps})"
                 yield (step_result, "")
+            elif self.state == AgentState.FINISHED:
+                self.current_step = 0
+                self.state = AgentState.IDLE
         if not step_executed:
             yield ("No steps executed", "")
 

@@ -315,7 +315,7 @@ class LLM:
                 "messages": messages,
             }
 
-            params["max_token"] = self.max_tokens
+            # params["max_token"] = self.max_tokens
             params["temperature"] = (
                 temperature if temperature is not None else self.temperature
             )

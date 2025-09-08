@@ -20,7 +20,7 @@ class ArxivResult(BaseModel):
 
 
 class ArxivResponse(ToolResult):
-    """Structured response from arxiv search tool, inh"""
+    """Structured response from arxiv search tool"""
     query: List = Field(description="Arxiv search keywords")
     results: List[ArxivResult] = Field(default_factory=list, description="List of search results")
 

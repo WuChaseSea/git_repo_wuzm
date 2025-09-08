@@ -23,6 +23,7 @@ async def main():
             return
         
         logger.warning("Processing your request...")
+        
         await agent.run(prompt)
         logger.info("Request processing completed.")
     except KeyboardInterrupt:
