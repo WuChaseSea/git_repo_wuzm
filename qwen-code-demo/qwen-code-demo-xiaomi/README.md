@@ -64,12 +64,12 @@
 
 1. 克隆项目到本地：
 ```bash
-git clone https://github.com/your-username/mood-companion.git
+git clone https://github.com/WuChaseSea/git_repo_wuzm.git
 ```
 
 2. 进入项目目录：
 ```bash
-cd mood-companion
+cd qwen-code-demo/qwen-code-demo-xiaomi
 ```
 
 3. 使用浏览器打开 `index.html` 文件即可使用
@@ -77,13 +77,13 @@ cd mood-companion
 ## 🎨 界面预览
 
 ### 主界面
-![主界面](screenshots/main-interface.png)
-
-### 推荐卡片
-![推荐卡片](screenshots/recommendation-cards.png)
+![主界面](./figures/xiaomi-demo.jpg)
 
 ### 情绪路线
-![情绪路线](screenshots/mood-route.png)
+![情绪路线](./figures/xiaomi-demo1.jpg)
+
+### 推荐卡片
+![推荐卡片](./figures/xiaomi-demo2.png)
 
 ## 🔧 开发指南
 
