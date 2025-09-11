@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>儿童学习计时器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Comic Sans MS', '幼圆', '微软雅黑', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+            border: 8px solid #FFD700;
+        }
+        
+        h1 {
+            color: #FF6B6B;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 #FFD700;
+        }
+        
+        .timer-display {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #4ECDC4;
+            margin: 30px 0;
+            text-shadow: 3px 3px 0 #FFD700;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .controls {
+            margin: 25px 0;
+        }
+        
+        .time-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .time-btn {
+            background: #A6C1EE;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 0 #7BA7DB;
+            min-width: 80px;
+        }
+        
+        .time-btn:hover {
+            background: #8AAEE0;
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #7BA7DB;
+        }
+        
+        .time-btn.active {
+            background: #FF6B6B;
+            box-shadow: 0 4px 0 #E55B5B;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .start-btn {
+            background: #4ECDC4;
+            flex: 1;
+        }
+        
+        .reset-btn {
+            background: #FFD166;
+        }
+        
+        .stars-section {
+            background: #FFF9C4;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 25px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stars-display {
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin: 15px 0;
+            min-height: 60px;
+        }
+        
+        .collect-btn {
+            background: #FFD700;
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 30px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #FFA000;
+            transition: all 0.3s;
+            margin: 15px 0;
+        }
+        
+        .collect-btn:hover {
+            background: #FFC107;
+            transform: scale(1.05);
+        }
+        
+        .collect-btn:disabled {
+            background: #E0E0E0;
+            color: #9E9E9E;
+            box-shadow: 0 5px 0 #BDBDBD;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            font-size: 1.4rem;
+            color: #FF6B6B;
+            min-height: 40px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .star {
+            display: inline-block;
+            animation: float 3s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .star:nth-child(2) { animation-delay: 0.5s; }
+        .star:nth-child(3) { animation-delay: 1s; }
+        .star:nth-child(4) { animation-delay: 1.5s; }
+        .star:nth-child(5) { animation-delay: 2s; }
+        
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .timer-display {
+                font-size: 3.5rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+                font-size: 1.1rem;
+            }
+            
+            .time-btn {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 儿童学习计时器 🌟</h1>
+        
+        <div class="timer-display" id="timer">25:00</div>
+        
+        <div class="message" id="message">准备开始学习了吗？</div>
+        
+        <div class="controls">
+            <div class="time-buttons">
+                <button class="time-btn" data-minutes="5">5分钟</button>
+                <button class="time-btn" data-minutes="10">10分钟</button>
+                <button class="time-btn" data-minutes="15">15分钟</button>
+                <button class="time-btn active" data-minutes="25">25分钟</button>
+                <button class="time-btn" data-minutes="30">30分钟</button>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn start-btn" id="startBtn">开始</button>
+                <button class="btn reset-btn" id="resetBtn">重置</button>
+            </div>
+        </div>
+        
+        <div class="stars-section">
+            <h2>我的小星星 ⭐</h2>
+            <div class="stars-display" id="starsDisplay">
+                <span class="star">⭐</span> 0 <span class="star">⭐</span>
+            </div>
+            <button class="collect-btn" id="collectBtn" disabled>领取星星!</button>
+            <p>完成计时可获得星星奖励!</p>
+        </div>
+    </div>
+
+    <script>
+        // 计时器变量
+        let totalSeconds = 25 * 60; // 默认25分钟
+        let timerInterval = null;
+        let isRunning = false;
+        let isCompleted = false;
+        
+        // DOM元素
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const collectBtn = document.getElementById('collectBtn');
+        const messageEl = document.getElementById('message');
+        const starsDisplay = document.getElementById('starsDisplay');
+        const timeButtons = document.querySelectorAll('.time-btn');
+        
+        // 星星计数器
+        let stars = 0;
+        const savedStars = localStorage.getItem('kidTimerStars');
+        if (savedStars !== null) {
+            stars = parseInt(savedStars);
+            updateStarsDisplay();
+        }
+        
+        // 格式化时间为 MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            timerDisplay.textContent = formatTime(totalSeconds);
+        }
+        
+        // 更新星星显示
+        function updateStarsDisplay() {
+            starsDisplay.innerHTML = `<span class="star">⭐</span> ${stars} <span class="star">⭐</span>`;
+            localStorage.setItem('kidTimerStars', stars);
+        }
+        
+        // 开始计时器
+        function startTimer() {
+            if (isRunning) return;
+            
+            isRunning = true;
+            isCompleted = false;
+            startBtn.textContent = "暂停";
+            messageEl.textContent = "做得好！专心学习哦！";
+            
+            // 计时期间禁用时间按钮
+            timeButtons.forEach(btn => btn.disabled = true);
+            
+            timerInterval = setInterval(() => {
+                totalSeconds--;
+                updateTimerDisplay();
+                
+                if (totalSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    isCompleted = true;
+                    startBtn.textContent = "开始";
+                    messageEl.textContent = "太棒了！你完成了一个学习时段，获得一颗星星！";
+                    collectBtn.disabled = false;
+                    
+                    // 重新启用时间按钮
+                    timeButtons.forEach(btn => btn.disabled = false);
+                    
+                    // 播放完成音效
+                    playCompletionSound();
+                }
+            }, 1000);
+        }
+        
+        // 暂停计时器
+        function pauseTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.textContent = "继续";
+            messageEl.textContent = "计时器已暂停";
+        }
+        
+        // 重置计时器
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            isCompleted = false;
+            startBtn.textContent = "开始";
+            collectBtn.disabled = true;
+            messageEl.textContent = "计时器已重置，准备开始学习了吗？";
+            
+            // 重新启用时间按钮
+            timeButtons.forEach(btn => btn.disabled = false);
+        }
+        
+        // 播放完成音效
+        function playCompletionSound() {
+            // 创建一个简单的音效
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(context.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 523.25; // C5
+            gainNode.gain.value = 0.3;
+            
+            oscillator.start();
+            
+            // 播放音符序列
+            setTimeout(() => {
+                oscillator.frequency.value = 659.25; // E5
+            }, 150);
+            
+            setTimeout(() => {
+                oscillator.frequency.value = 783.99; // G5
+            }, 300);
+            
+            setTimeout(() => {
+                oscillator.stop();
+            }, 500);
+        }
+        
+        // 事件监听器
+        startBtn.addEventListener('click', () => {
+            if (isRunning) {
+                pauseTimer();
+            } else {
+                startTimer();
+            }
+        });
+        
+        resetBtn.addEventListener('click', resetTimer);
+        
+        collectBtn.addEventListener('click', () => {
+            if (isCompleted) {
+                stars++;
+                updateStarsDisplay();
+                collectBtn.disabled = true;
+                messageEl.textContent = "恭喜你获得一颗星星！继续加油！";
+                isCompleted = false;
+            }
+        });
+        
+        // 时间按钮事件监听器
+        timeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有按钮的active类
+                timeButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // 添加active类到当前按钮
+                button.classList.add('active');
+                
+                // 设置新的时间
+                const minutes = parseInt(button.dataset.minutes);
+                totalSeconds = minutes * 60;
+                updateTimerDisplay();
+                
+                // 重置状态
+                resetTimer();
+            });
+        });
+        
+        // 初始化显示
+        updateTimerDisplay();
+    </script>
+</body>
+</html>

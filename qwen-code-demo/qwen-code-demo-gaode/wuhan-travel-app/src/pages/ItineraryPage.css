@@ -1,0 +1,64 @@
+.itinerary-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.nav-button {
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.nav-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.nav-button.active {
+  background: linear-gradient(45deg, #a18cd1, #fbc2eb);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.date-weather {
+  font-size: 1.2rem;
+  color: #f8f9fa;
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  display: inline-block;
+  padding: 8px 20px;
+  border-radius: 20px;
+}
+
+.activities-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .navigation {
+    gap: 10px;
+  }
+  
+  .nav-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+}

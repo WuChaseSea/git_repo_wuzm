@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贴心小秘书</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- 高德地图API CSS -->
+    <link rel="stylesheet" href="https://webapi.amap.com/maps?v=1.4.15&key=YOUR_API_KEY">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="app-title">贴心小秘书</h1>
+            <p class="app-subtitle">懂你的心情，给你最温暖的陪伴</p>
+        </header>
+
+        <main>
+            <!-- 情绪输入区域 -->
+            <section class="mood-input-section">
+                <div class="input-card">
+                    <h2>今天你的心情如何？</h2>
+                    <textarea id="moodInput" placeholder="可以输入文字描述你的心情，例如：'很累'、'心情不好'、'想放松'..."></textarea>
+                    <button id="submitMood" class="submit-btn">让我来安慰你</button>
+                </div>
+            </section>
+
+            <!-- 情绪安慰区域 -->
+            <section id="comfortSection" class="comfort-section hidden">
+                <div class="section-title">
+                    <h2>暖心安慰</h2>
+                </div>
+                <div id="comfortCard" class="comfort-card">
+                    <!-- 安慰内容将在这里显示 -->
+                </div>
+            </section>
+
+            <!-- 出行推荐区域 -->
+            <section id="recommendationSection" class="recommendation-section hidden">
+                <div class="section-title">
+                    <h2>贴心出行推荐</h2>
+                </div>
+                <div id="recommendationCards" class="cards-container">
+                    <!-- 推荐卡片将在这里显示 -->
+                </div>
+            </section>
+
+            <!-- 路线规划区域 -->
+            <section id="routeSection" class="route-section hidden">
+                <div class="section-title">
+                    <h2>专属治愈路线</h2>
+                </div>
+                <div id="routeContainer">
+                    <!-- 路线将在这里显示 -->
+                </div>
+            </section>
+
+            <!-- 惊喜模式区域 -->
+            <section id="surpriseSection" class="surprise-section hidden">
+                <div class="section-title">
+                    <h2>小确幸惊喜</h2>
+                </div>
+                <div id="surpriseCard" class="surprise-card">
+                    <!-- 惊喜内容将在这里显示 -->
+                </div>
+            </section>
+
+            <!-- 情绪日记区域 -->
+            <section id="diarySection" class="diary-section hidden">
+                <div class="section-title">
+                    <h2>情绪日记</h2>
+                </div>
+                <div class="diary-container">
+                    <div id="diaryTimeline" class="diary-timeline">
+                        <!-- 日记条目将在这里显示 -->
+                    </div>
+                    <button id="clearDiary" class="clear-btn">清空日记</button>
+                </div>
+            </section>
+
+            <!-- 心情地图区域 -->
+            <section id="moodMapSection" class="mood-map-section hidden">
+                <div class="section-title">
+                    <h2>心情地图</h2>
+                </div>
+                <div class="mood-map-container">
+                    <div id="moodMap" class="mood-map">
+                        <!-- 心情地图将在这里显示 -->
+                    </div>
+                    <div class="mood-map-legend">
+                        <h3>情绪图例</h3>
+                        <div class="legend-item">
+                            <div class="legend-color negative"></div>
+                            <span>低落情绪</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color positive"></div>
+                            <span>积极情绪</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color reward"></div>
+                            <span>犒赏情绪</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>贴心小秘书 &copy; 2025 温暖你的每一天</p>
+        </footer>
+    </div>
+
+    <!-- 高德地图API JavaScript -->
+    <script src="gaode-api.js" type="module"></script>
+    <script src="script.js" type="module"></script>
+</body>
+</html>

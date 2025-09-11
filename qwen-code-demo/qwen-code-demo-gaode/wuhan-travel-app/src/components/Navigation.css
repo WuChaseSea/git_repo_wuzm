@@ -1,0 +1,52 @@
+.navigation {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  padding: 0;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 0 auto 30px;
+}
+
+.navigation ul {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation li {
+  margin: 0;
+}
+
+.navigation a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 25px;
+  transition: all 0.3s ease;
+  border-radius: 10px;
+}
+
+.navigation a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.navigation a.active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .navigation ul {
+    flex-direction: column;
+  }
+  
+  .navigation {
+    width: 90%;
+  }
+  
+  .navigation a {
+    text-align: center;
+  }
+}

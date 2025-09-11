@@ -1,0 +1,608 @@
+/* styles.css */
+
+/* 基础样式和变量 */
+:root {
+  --primary-color: #a7c7e7; /* 柔和蓝色 */
+  --secondary-color: #c19a6b; /* 温暖棕褐色 */
+  --accent-color: #b19cd9; /* 淡紫色 */
+  --light-color: #fdfd96; /* 柔和黄色 */
+  --dark-color: #6b5b95; /* 深紫色 */
+  --background-color: #f8f9fa;
+  --card-bg: #ffffff;
+  --text-color: #333333;
+  --text-light: #666666;
+  --border-radius: 16px;
+  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans SC', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 头部样式 */
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 20px 0;
+}
+
+.app-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 10px;
+  background: linear-gradient(45deg, var(--dark-color), var(--accent-color));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.app-subtitle {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  font-weight: 300;
+}
+
+/* 主要内容区域 */
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* 章节标题 */
+.section-title {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.section-title h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+}
+
+.section-title h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+  border-radius: 2px;
+}
+
+/* 卡片基础样式 */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 25px;
+  transition: var(--transition);
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12);
+}
+
+/* 情绪输入区域 */
+.mood-input-section .input-card {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.mood-input-section h2 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: var(--dark-color);
+}
+
+#moodInput {
+  width: 100%;
+  min-height: 120px;
+  padding: 15px;
+  font-size: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  resize: vertical;
+  margin-bottom: 20px;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+#moodInput:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(177, 156, 217, 0.2);
+}
+
+.submit-btn {
+  background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(167, 199, 231, 0.4);
+}
+
+.submit-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 20px rgba(167, 199, 231, 0.6);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* 安慰卡片样式 */
+.comfort-section {
+  margin-top: 20px;
+}
+
+.comfort-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f0f4ff, #faf0ff);
+  position: relative;
+  overflow: hidden;
+}
+
+.comfort-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 150px;
+  height: 150px;
+  background: var(--light-color);
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.comfort-card::after {
+  content: '';
+  position: absolute;
+  bottom: -80px;
+  left: -30px;
+  width: 200px;
+  height: 200px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.comfort-content {
+  position: relative;
+  z-index: 1;
+}
+
+.comfort-content h3 {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: var(--dark-color);
+}
+
+.comfort-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-color);
+}
+
+/* 推荐卡片容器 */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* 推荐卡片样式 */
+.recommendation-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.place-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 15px;
+}
+
+.place-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: var(--dark-color);
+}
+
+.place-info p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+
+.place-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  font-size: 0.9rem;
+}
+
+.rating {
+  color: #ffa726;
+  font-weight: 500;
+}
+
+.distance {
+  color: var(--text-light);
+}
+
+/* 路线规划样式 */
+.route-section {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 25px;
+  box-shadow: var(--box-shadow);
+}
+
+#route-map {
+  height: 400px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.route-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.route-step {
+  flex: 1;
+  min-width: 200px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid #e9ecef;
+}
+
+.route-step-number {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  line-height: 30px;
+  margin-bottom: 15px;
+}
+
+.route-step h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: var(--dark-color);
+}
+
+/* 惊喜卡片样式 */
+.surprise-card {
+  max-width: 800px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #fff5e6, #f0f0ff);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.surprise-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 120px;
+  height: 120px;
+  background: var(--light-color);
+  border-radius: 50%;
+  opacity: 0.4;
+}
+
+.surprise-card::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -20px;
+  width: 150px;
+  height: 150px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  opacity: 0.2;
+}
+
+.surprise-content {
+  position: relative;
+  z-index: 1;
+}
+
+.surprise-content h3 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  color: var(--dark-color);
+}
+
+.surprise-content p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 25px;
+}
+
+.plan-details {
+  text-align: left;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.plan-details h4 {
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+  color: var(--dark-color);
+}
+
+.plan-details ul {
+  padding-left: 20px;
+}
+
+.plan-details li {
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.plan-details li::before {
+  content: '•';
+  color: var(--accent-color);
+  font-weight: bold;
+  position: absolute;
+  left: -15px;
+}
+
+/* 情绪日记样式 */
+.diary-section {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 25px;
+  box-shadow: var(--box-shadow);
+}
+
+.diary-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.diary-timeline {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 20px;
+}
+
+.diary-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+.diary-entry {
+  position: relative;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent-color);
+}
+
+.diary-entry::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-color);
+  left: -37px;
+  top: 20px;
+}
+
+.diary-date {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+
+.diary-mood {
+  font-weight: 500;
+  color: var(--dark-color);
+  margin-bottom: 10px;
+}
+
+.diary-comfort {
+  font-style: italic;
+  color: var(--text-light);
+  padding: 10px;
+  background: rgba(177, 156, 217, 0.1);
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.clear-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clear-btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+}
+
+/* 加载状态样式 */
+.loading {
+  text-align: center;
+  padding: 30px;
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(177, 156, 217, 0.3);
+  border-top-color: var(--accent-color);
+  border-radius: 50%;
+  margin-left: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 30px;
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+/* 隐藏类 */
+.hidden {
+  display: none;
+}
+
+/* 页脚样式 */
+footer {
+  text-align: center;
+  margin-top: 60px;
+  padding: 20px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+  
+  .app-title {
+    font-size: 2.2rem;
+  }
+  
+  .cards-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .route-steps {
+    flex-direction: column;
+  }
+  
+  .section-title h2 {
+    font-size: 1.5rem;
+  }
+  
+  #route-map {
+    height: 300px;
+  }
+  
+  .diary-timeline {
+    padding-left: 20px;
+  }
+  
+  .diary-entry::before {
+    left: -27px;
+  }
+}
+
+/* 动画效果 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
