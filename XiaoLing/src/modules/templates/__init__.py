@@ -1,0 +1,1 @@
+from .templates import xiaoling_prompt
