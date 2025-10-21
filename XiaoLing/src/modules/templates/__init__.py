@@ -1,1 +1,1 @@
-from .templates import xiaoling_prompt
+from .templates import SYSTEM_PROMPT, XIAOLING_PROMPT

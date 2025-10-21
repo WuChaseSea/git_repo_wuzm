@@ -17,7 +17,7 @@ class BaseApp:
             # 第一列
             with gr.Column(scale=1, min_width=200):
                 gr.Markdown("### 🎛️ 模式设置")
-                self.mode = gr.Radio(["共鸣对话", "灵感共创", "放松陪伴"], label="选择模式", value="共鸣对话", elem_id="mode_choose")
+                self.mode = gr.Radio(["知性搭子", "可爱搭子", "吐槽搭子"], label="选择模式", value="共鸣对话", elem_id="mode_choose")
 
                 gr.Markdown("### 🎵 音乐播放")
                 self.music = gr.Dropdown(["无", "轻音乐", "治愈旋律", "自然音"], label="选择音乐", value="无", elem_id="music_display")
@@ -41,7 +41,7 @@ class BaseApp:
                     # 左半部分：对话区
                     with gr.Column(scale=1):
                         gr.Markdown("### 💬 小灵的共鸣对话")
-                        self.chat_box = gr.Chatbot(label="与小灵聊天", type="messages", height=400)
+                        self.chat_box = gr.Chatbot(label="与小灵聊天", type="messages", height=450, autoscroll=True)
                     # 右半部分：内容创作与广场内容
                     with gr.Column(scale=1):
                         gr.Markdown("### 🎨 内容创作")

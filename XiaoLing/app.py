@@ -1,5 +1,7 @@
 from src.base import BaseApp
 
-app = BaseApp()
-demo = app.make()
-demo.launch()
+
+if __name__ == "__main__":
+    app = BaseApp()
+    demo = app.make()
+    demo.launch()
