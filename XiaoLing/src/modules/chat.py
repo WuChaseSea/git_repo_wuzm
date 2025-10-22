@@ -3,6 +3,8 @@ import gradio as gr
 
 from src.modules.llm import chat_llm
 
+from src.agent.xiaoling import XIAOLING
+
 
 class ChatPipeline:
 
@@ -11,7 +13,7 @@ class ChatPipeline:
 
         self.register_events()
 
-        self.chat_llm = chat_llm
+        self.xiaoling = XIAOLING(mode="知性搭子")
     
     def register_events(self):
         
@@ -27,11 +29,11 @@ class ChatPipeline:
             outputs=[self.demo.user_input, self.demo.chat_box]
         )
     
-    def chat_with_user(self, mode, user_input, chat_history):
+    async def chat_with_user(self, mode, user_input, chat_history):
         chat_history = list(chat_history or [])
         chat_history.append({"role": "user", "content": user_input})
         refs = ""  # 这里每一次都是空字符串会导致输出的时候只显示模型的输出，历史对话不显示，后续可以考虑加上chat_history的内容
-        for response in self.chat_llm.stream({"mode": mode,"user_input": user_input},history=chat_history):
+        async for response, output in self.xiaoling.run_stream(request=user_input):
             refs += response
             yield "", [{"role": "assistant", "content": refs}]
         

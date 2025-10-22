@@ -20,7 +20,12 @@ class BaseApp:
                 self.mode = gr.Radio(["知性搭子", "可爱搭子", "吐槽搭子"], label="选择模式", value="共鸣对话", elem_id="mode_choose")
 
                 gr.Markdown("### 🎵 音乐播放")
-                self.music = gr.Dropdown(["无", "轻音乐", "治愈旋律", "自然音"], label="选择音乐", value="无", elem_id="music_display")
+                self.music = gr.Audio(
+                    value="assets/a-small-miracle.mp3",   # 本地音频文件路径
+                    label="当前播放",
+                    autoplay=False,             # 是否自动播放（True 会立即播放）
+                    interactive=False           # 用户不能上传，只能播放
+                )
 
                 gr.Markdown("### 快捷情绪")
                 moods = [
