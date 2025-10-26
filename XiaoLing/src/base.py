@@ -17,7 +17,7 @@ class BaseApp:
             # 第一列
             with gr.Column(scale=1, min_width=200):
                 gr.Markdown("### 🎛️ 模式设置")
-                self.mode = gr.Radio(["知性搭子", "可爱搭子", "吐槽搭子"], label="选择模式", value="共鸣对话", elem_id="mode_choose")
+                self.mode = gr.Radio(["知性搭子", "可爱搭子", "吐槽搭子"], label="选择模式", value="知性搭子", elem_id="mode_choose")
 
                 gr.Markdown("### 🎵 音乐播放")
                 self.music = gr.Audio(
@@ -93,6 +93,6 @@ class BaseApp:
         with gr.Blocks(theme=gr.themes.Soft(), title="小灵 · 共鸣陪伴智能体") as demo:
             self.ui()
 
-            self.chat_pipeline = ChatPipeline(self)
+            self.chat_pipeline = ChatPipeline(self, demo=demo)
         
         return demo
