@@ -38,7 +38,7 @@ class BaseApp:
                 self.mood_buttons = [gr.Button(text) for text in moods]
 
                 gr.Markdown("### 📍 高德推荐")
-                place = gr.Textbox(label="推荐地点", placeholder="例如：咖啡店 / 公园", elem_id="place_recommend")
+                self.place_panel = gr.HTML(visible=False, label="推荐地点", elem_id="place_recommend")
 
             # 第二列和第三列内容放在一个 Column 内
             with gr.Column(scale=3, min_width=600):
@@ -63,15 +63,16 @@ class BaseApp:
             # 第四列
             with gr.Column(scale=1, min_width=250):
                 gr.Markdown("### 🧍 用户信息")
+                gr.HTML("""
+                    <style>
+                        /* 隐藏 DataFrame 表头 */
+                        thead {display: none !important;}
+                    </style>
+                    """)
                 gr.Dataframe(headers=["属性", "值"], value=[["昵称", "SoulUser001"], ["状态", "在线"], ["等级", "Lv.3"]])
 
                 gr.Markdown("### 📈 情绪曲线")
-                gr.LinePlot(
-                    label="最近情绪波动",
-                    x=[1, 2, 3, 4, 5],
-                    y=[0.3, 0.6, 0.5, 0.8, 0.7],
-                    title="情绪能量"
-                )
+                self.emotion_plot = gr.Plot(label="最近一周情绪波动")
 
                 gr.Markdown("### 💞 潜在共鸣用户推荐")
                 gr.Textbox(value="・SoulUser097（最近分享：『下班后的风真好』）\n・SoulUser112（关键词：#疲惫但不想停）", lines=5)

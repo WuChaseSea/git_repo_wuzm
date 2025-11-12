@@ -6,7 +6,7 @@ from qwen_agent.llm import get_chat_model
 from langchain_community.chat_models.tongyi import ChatTongyi
 from llama_index.core import PromptTemplate
 
-from src.modules.templates import SYSTEM_PROMPT, XIAOLING_PROMPT, INTENTION_PROMPT, PROVIDED_CHAT_PROMPT
+from src.modules.templates import SYSTEM_PROMPT, XIAOLING_PROMPT, INTENTION_PROMPT, PROVIDED_CHAT_PROMPT, AMAP_PROMPT, CONTENT_PROMPT, EMOTION_SCROE_PROMPT
 from src.logger import logger
 
 class LLMPipeline():
@@ -112,6 +112,88 @@ class LLMPipeline():
                 "text_5": "✍️ 说点别的（自定义输入）"
             }
         return list(provided_data.values())
+    
+    def amap_recommendation(self, user_message, history=None): 
+        mode, user_input = user_message.get("mode"), user_message.get("user_input")
+        amap_prompt = PromptTemplate(AMAP_PROMPT).format(
+            mode=mode,
+            user_input=user_input,
+            chat_history=history if history else ""
+        )
+        messages = []
+        messages.append(
+            {
+                "role": "user",
+                "content": amap_prompt
+            }
+        )
+        response = self.llm.chat(messages, stream=False)
+        try:
+            clean_response = response[0]["content"].strip('`').replace('json\n', '', 1)
+            amap_data = json.loads(clean_response)
+        except Exception as e:
+            logger.error(f"AMAP parse error: {e}")
+            logger.info(f"AMAP raw response: {response[0]['content']}")
+            amap_data = {
+                "emotion": "未知",
+                "place_type": "咖啡店",
+                "reason": "先试着休息一下再说吧"
+            }
+
+        return amap_data
+    
+    def content_creation(self, user_message, history=None): 
+        mode, user_input = user_message.get("mode"), user_message.get("user_input")
+        content_prompt = PromptTemplate(CONTENT_PROMPT).format(
+            mode=mode,
+            user_input=user_input,
+            chat_history=history if history else ""
+        )
+        messages = []
+        messages.append(
+            {
+                "role": "user",
+                "content": content_prompt
+            }
+        )
+        response = self.llm.chat(messages, stream=False)
+        try:
+            content_data = response[0]["content"].strip()
+        except Exception as e:
+            logger.error(f"Content creation error: {e}")
+            logger.info(f"Content creation raw response: {response[0]['content']}")
+            content_data = "抱歉，内容生成出现问题，请稍后再试。"
+
+        return content_data
+    
+    def emotion_score(self, user_message, history=None): 
+        mode, user_input = user_message.get("mode"), user_message.get("user_input")
+        emotion_prompt = PromptTemplate(EMOTION_SCROE_PROMPT).format(
+            mode=mode,
+            user_input=user_input,
+            chat_history=history if history else ""
+        )
+        messages = []
+        messages.append(
+            {
+                "role": "user",
+                "content": emotion_prompt
+            }
+        )
+        response = self.llm.chat(messages, stream=False)
+        try:
+            clean_response = response[0]["content"].strip('`').replace('json\n', '', 1)
+            emotion_data = json.loads(clean_response)
+        except Exception as e:
+            import pdb;pdb.set_trace()
+            logger.error(f"Emotion score parse error: {e}")
+            logger.info(f"Emotion score raw response: {response[0]['content']}")
+            emotion_data = {
+                "emotion": "neutral",
+                "score": 0.0
+            }
+
+        return emotion_data
 
 
 chat_llm = LLMPipeline()
