@@ -1,4 +1,5 @@
 *.sqlite
+.env
 embedding_models/
 data/
 cache/
