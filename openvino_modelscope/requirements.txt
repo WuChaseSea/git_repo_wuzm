@@ -80,12 +80,14 @@ nncf==3.0.0
 notebook_shim==0.2.4
 numpy==2.2.6
 onnx==1.20.1
+onnx-ir==0.2.0
+onnxscript==0.6.2
 openvino @ file:///D:/Software/openvino-2026.0.0-20965-cp312-cp312-win_amd64.whl#sha256=10af8a90373547c5dec2b53c60dac38a7a29df8662fe097a3c6c67750e7c88c6
 openvino-telemetry==2025.2.0
 openvino-tokenizers==2026.0.0.0
-optimum==2.1.0
-optimum-intel==1.27.0
-optimum-onnx==0.1.0
+optimum @ git+https://github.com/huggingface/optimum@ec676fd4e0b1440e91549e7a1aa82e0de85e79b5
+optimum-intel @ git+https://github.com/openvino-dev-samples/optimum-intel.git@2f62e5aee74b4acba3836e1f26678c0db0a09c00
+optimum-onnx @ git+https://github.com/huggingface/optimum-onnx.git@9ca6f688046d1824e3e0b660b1044fa0b39717f2
 orjson==3.11.7
 packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049137378/work
 pandas==2.3.3
@@ -146,7 +148,8 @@ torchvision==0.24.0
 tornado==6.5.5
 tqdm==4.67.3
 traitlets==5.14.3
-transformers==4.57.6
+transformers==4.57.0
+transformers-stream-generator==0.0.5
 typer==0.24.1
 typing-inspection==0.4.2
 typing_extensions==4.15.0
