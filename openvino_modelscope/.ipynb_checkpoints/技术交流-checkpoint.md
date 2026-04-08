@@ -52,8 +52,52 @@ pip install git+https://github.com/huggingface/diffusers.git@a1f36ee3ef4ae1bf98b
 
 ## 应用场景说明
 
+本项目旨在构建一个本地 AI 美术助理，将负责“看图和理解”的视觉大模型（Qwen3-VL）与负责画画的图像生成模型（Z-Image）结对串联。不需要繁琐的参数面板和提示词咒语，我们只需像日常聊天一样输入大白话，或者随手勾勒几笔火柴人，这个小助手就能通过Qwen3-VL理解图像信息，并实现复杂的模板生成工作，真正实现了零门槛的创意变现。支撑场景有：
+1. 支持指定图像生成，可纯语言描述，也可手绘粗略图，指定风格，例如3D画风，表情包生成等；
+2. 支持上传图像，文本描述修改内容，生成修改后的图像；
+3. 支持上传原始图像和参考风格图像，也可自定义意见，生成新图像；
+
 ## 应用运行展示
+
+场景一：基于语言描述生成图像，添加手绘图结合语言描述生成图像
+
+![demo1](./assets/demo1.png)
+
+![demo1](./assets/demo1-1.png)
+
+场景二：基于语言描述提供对原始影像的编辑操作
+
+![demo2](./assets/demo2.png)
+
+场景三：提供参考影像风格，可添加文本描述，绘制对应的风格迁移后的图像
+
+![demo3](./assets/demo3.png)
 
 ## Skills 运行展示
 
+首先从https://modelscope.cn/studios/AgentScope/CoPaw/summary点击复制，设置未公开，会进入到如下界面：
+
+![copaw](./assets/copaw.png)
+
+首次使用对话，会需要配置模型：
+
+![copaw-dashscope-settings](./assets/copaw-dashscope-settings.png)
+
+配置好密钥之后红色框内选好使用的模型，再次回到chat界面即可对话，这里我选择的DashScope，输入自己的API Key：
+
+![copaw-dashscope-settings1](./assets/copaw-dashscope-settings1.png)
+
+在技能池界面点击右上角添加自己的skill
+
+![skill-1](./assets/skill-1.png)
+
+添加完成之后我们就能在对话中看到是否支持刚添加的skill：
+
+![skill-2](./assets/skill-2.png)
+
 ## 总结与展望
+
+这次OpenVINO的实践主要难点在于optimum-intel、openvino以及transformers等库的版本对应，具有较高的版本要求，否则极易出现问题。但不可否认，通过 INT4 量化，能在普通的个人 PC 上流畅运行庞大的多模态大模型和 Diffusion 渲染管道，这种彻底摆脱云端算力束缚的体验确实极具吸引力，也验证了 AI PC 的巨大潜力。
+
+在魔搭创空间 Copaw 上将复杂的逻辑封装为 SKILL 是一次很有价值的探索。不过在实际开发中发现，如果过于依赖让 AI 自行试错和调整底层调用代码，大模型反复的报错重试会导致 Token 消耗极其巨大。
+
